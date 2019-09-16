@@ -25,7 +25,9 @@ SECRET_KEY = 'j_f8$0glb!5z3vqf+efe0raoia_wrs0*h#2xy-ndlzp^3=$!nr'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'capstone-smart-email.herokuapp.com'
+]
 
 
 # Application definition
