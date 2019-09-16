@@ -1,1 +1,1 @@
-web: gunicorn datamanager/wsgi
+web: gunicorn datamanager.wsgi
