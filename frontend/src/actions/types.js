@@ -1,0 +1,1 @@
+export const GET_CATALGPAIRS = "GET_CATALGPAIRS";
