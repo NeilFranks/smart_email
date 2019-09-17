@@ -1,11 +1,13 @@
 import React, { Component, Fragment } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
-import { getCatAlgPairs } from "../../actions/catAlgPairs";
+import { getCatAlgPairs, deleteCatAlgPair } from "../../actions/catAlgPairs";
 
 export class CatAlgPairs extends Component {
   static propTypes = {
-    catAlgPairs: PropTypes.array.isRequired
+    catAlgPairs: PropTypes.array.isRequired,
+    getCatAlgPairs: PropTypes.func.isRequired,
+    deleteCatAlgPair: PropTypes.func.isRequired
   };
 
   componentDidMount() {
@@ -32,7 +34,15 @@ export class CatAlgPairs extends Component {
                   <td>{catAlgPair.category}</td>
                   <td>{catAlgPair.algorithm}</td>
                   <td>
-                    <button className="btn btn-danger btn-sm">Delete</button>
+                    <button
+                      onClick={this.props.deleteCatAlgPair.bind(
+                        this,
+                        catAlgPair.id
+                      )}
+                      className="btn btn-danger btn-sm"
+                    >
+                      Delete
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -50,5 +60,5 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  { getCatAlgPairs }
+  { getCatAlgPairs, deleteCatAlgPair }
 )(CatAlgPairs);
