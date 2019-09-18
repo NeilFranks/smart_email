@@ -1,6 +1,12 @@
 import axios from "axios";
+import { createMessage } from "./messages";
 
-import { GET_CATALGPAIRS, DELETE_CATALGPAIR, ADD_CATALGPAIR } from "./types";
+import {
+  GET_CATALGPAIRS,
+  DELETE_CATALGPAIR,
+  ADD_CATALGPAIR,
+  GET_ERRORS
+} from "./types";
 
 export const getCatAlgPairs = () => dispatch => {
   axios
@@ -18,6 +24,7 @@ export const deleteCatAlgPair = id => dispatch => {
   axios
     .delete(`/api/catAlg/${id}/`)
     .then(res => {
+      dispatch(createMessage({ deleteCategory: "Category Deleted" }));
       dispatch({
         type: DELETE_CATALGPAIR,
         payload: id
@@ -30,10 +37,20 @@ export const addCatAlgPair = catAlgPair => dispatch => {
   axios
     .post("/api/catAlg/", catAlgPair)
     .then(res => {
+      dispatch(createMessage({ addCategory: "Category Added" }));
       dispatch({
         type: ADD_CATALGPAIR,
         payload: res.data
       });
     })
-    .catch(err => console.log(err));
+    .catch(err => {
+      const errors = {
+        msg: err.response.data,
+        status: err.response.status
+      };
+      dispatch({
+        type: GET_ERRORS,
+        payload: errors
+      });
+    });
 };

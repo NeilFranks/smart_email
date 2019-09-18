@@ -6,17 +6,19 @@ from .serializers import CatAlgSerializer, EmailLoginSerializer, UserSerializer
 
 
 class CatAlgViewSet(viewsets.ModelViewSet):
+    queryset = CategoryAlgorithmPair.objects.all()  # get all Emaillogins
+
     permissions_classes = [
-        permissions.IsAuthenticated  # need to restrict this permission
+        permissions.AllowAny  # need to restrict this permission
     ]
 
     serializer_class = CatAlgSerializer
 
-    def get_queryset(self):
-        return self.request.user.catAlgs.all()
+    # def get_queryset(self):
+    #     return self.request.user.catAlgs.all()
 
-    def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
+    # def perform_create(self, serializer):
+    #     serializer.save(owner=self.request.user)
 
 
 # EmailLogin Viewset
