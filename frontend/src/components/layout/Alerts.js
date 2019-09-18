@@ -15,6 +15,10 @@ export class Alerts extends Component {
       if (error.msg.detail) {
         const message = error.status + ": " + error.msg.detail;
         alert.error(message);
+      } else if (error.msg.category) {
+        alert.error("Category: " + error.msg.category.join());
+      } else if (error.msg.algorithm) {
+        alert.error("todo: algorithm shouldn't be an input field. whoops");
       } else {
         alert.error("error that idk how to handle..");
       }
