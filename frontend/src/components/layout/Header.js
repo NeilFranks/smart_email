@@ -60,7 +60,7 @@ export class Header extends Component {
           </button>
           <div className="collapse navbar-collapse" id="navbarTogglerDemo01">
             <a className="navbar-brand" href="#">
-              Lead Manager
+              Smart Email Service
             </a>
           </div>
           {isAuthenticated ? authLinks : guestLinks}
