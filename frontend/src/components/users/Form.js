@@ -12,6 +12,7 @@ export class Form extends Component {
   static propTypes = {
     addCatAlgPair: PropTypes.func.isRequired
   };
+
   onChange = e => this.setState({ [e.target.name]: e.target.value });
 
   onSubmit = e => {
