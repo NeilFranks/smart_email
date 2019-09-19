@@ -1,12 +1,7 @@
 import axios from "axios";
-import { createMessage } from "./messages";
+import { createMessage, returnErrors } from "./messages";
 
-import {
-  GET_CATALGPAIRS,
-  DELETE_CATALGPAIR,
-  ADD_CATALGPAIR,
-  GET_ERRORS
-} from "./types";
+import { GET_CATALGPAIRS, DELETE_CATALGPAIR, ADD_CATALGPAIR } from "./types";
 
 export const getCatAlgPairs = () => dispatch => {
   axios
@@ -17,7 +12,9 @@ export const getCatAlgPairs = () => dispatch => {
         payload: res.data
       });
     })
-    .catch(err => console.log(err));
+    .catch(err =>
+      dispatch(returnErrors(err.response.data, err.response.status))
+    );
 };
 
 export const deleteCatAlgPair = id => dispatch => {
@@ -43,14 +40,7 @@ export const addCatAlgPair = catAlgPair => dispatch => {
         payload: res.data
       });
     })
-    .catch(err => {
-      const errors = {
-        msg: err.response.data,
-        status: err.response.status
-      };
-      dispatch({
-        type: GET_ERRORS,
-        payload: errors
-      });
-    });
+    .catch(err =>
+      dispatch(returnErrors(err.response.data, err.response.status))
+    );
 };

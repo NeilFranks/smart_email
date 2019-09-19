@@ -9,8 +9,6 @@
 {% endblock %}
 
 {% block content %}
-  Hi {{ user.username }}!
-  <p><a href="{% url 'login' %}">logout</a></p>
   <div id="app"></div>
     {% load static %}
     <script src="{% static "frontend/main.js" %}"></script>
