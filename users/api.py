@@ -7,7 +7,7 @@ from .serializers import CatAlgSerializer
 
 class CatAlgViewSet(viewsets.ModelViewSet):
     permissions_classes = [
-        permissions.AllowAny  # need to restrict this permission
+        permissions.IsAuthenticated,  # need to restrict this permission
     ]
 
     serializer_class = CatAlgSerializer

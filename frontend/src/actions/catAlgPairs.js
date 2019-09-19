@@ -1,11 +1,12 @@
 import axios from "axios";
 import { createMessage, returnErrors } from "./messages";
+import { tokenConfig } from "./auth";
 
 import { GET_CATALGPAIRS, DELETE_CATALGPAIR, ADD_CATALGPAIR } from "./types";
 
-export const getCatAlgPairs = () => dispatch => {
+export const getCatAlgPairs = () => (dispatch, getState) => {
   axios
-    .get("/api/catAlg/")
+    .get("/api/catAlg/", tokenConfig(getState))
     .then(res => {
       dispatch({
         type: GET_CATALGPAIRS,
@@ -17,9 +18,9 @@ export const getCatAlgPairs = () => dispatch => {
     );
 };
 
-export const deleteCatAlgPair = id => dispatch => {
+export const deleteCatAlgPair = id => (dispatch, getState) => {
   axios
-    .delete(`/api/catAlg/${id}/`)
+    .delete(`/api/catAlg/${id}/`, tokenConfig(getState))
     .then(res => {
       dispatch(createMessage({ deleteCategory: "Category Deleted" }));
       dispatch({
@@ -30,9 +31,9 @@ export const deleteCatAlgPair = id => dispatch => {
     .catch(err => console.log(err));
 };
 
-export const addCatAlgPair = catAlgPair => dispatch => {
+export const addCatAlgPair = catAlgPair => (dispatch, getState) => {
   axios
-    .post("/api/catAlg/", catAlgPair)
+    .post("/api/catAlg/", catAlgPair, tokenConfig(getState))
     .then(res => {
       dispatch(createMessage({ addCategory: "Category Added" }));
       dispatch({
