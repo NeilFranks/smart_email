@@ -1,33 +1,19 @@
-from .models import CategoryAlgorithmPair, EmailLogin, User
+from .models import CategoryAlgorithmPair
 from rest_framework import viewsets, permissions
-from .serializers import CatAlgSerializer, EmailLoginSerializer, UserSerializer
+from .serializers import CatAlgSerializer
 
 # CategoryAlgorithmPair Viewset
 
 
 class CatAlgViewSet(viewsets.ModelViewSet):
-    queryset = CategoryAlgorithmPair.objects.all()  # get all catAlgs
     permissions_classes = [
-        permissions.AllowAny  # need to restrict this permission
+        permissions.IsAuthenticated,  # need to restrict this permission
     ]
+
     serializer_class = CatAlgSerializer
 
-# EmailLogin Viewset
+    def get_queryset(self):
+        return self.request.user.catAlgPairs.all()
 
-
-class EmailLoginViewSet(viewsets.ModelViewSet):
-    queryset = EmailLogin.objects.all()  # get all Emaillogins
-    permissions_classes = [
-        permissions.AllowAny  # need to restrict this permission
-    ]
-    serializer_class = EmailLoginSerializer
-
-# User Viewset
-
-
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()  # get all Users
-    permissions_classes = [
-        permissions.AllowAny  # need to restrict this permission
-    ]
-    serializer_class = UserSerializer
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)

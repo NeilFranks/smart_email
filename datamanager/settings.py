@@ -43,8 +43,13 @@ INSTALLED_APPS = [
     "users",
     "rest_framework",
     "frontend",
-    "accounts.apps.AccountsConfig",
+    "knox",
+    'accounts'
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': ('knox.auth.TokenAuthentication',),
+}
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -114,7 +119,8 @@ USE_L10N = True
 USE_TZ = True
 
 # Change 'default' database configuration with $DATABASE_URL.
-DATABASES["default"].update(dj_database_url.config(conn_max_age=500, ssl_require=True))
+DATABASES["default"].update(dj_database_url.config(
+    conn_max_age=500, ssl_require=True))
 
 
 # Static files (CSS, JavaScript, Images)
