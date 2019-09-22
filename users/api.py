@@ -1,4 +1,3 @@
-from .models import CategoryAlgorithmPair
 from rest_framework import viewsets, permissions
 from .serializers import CatAlgSerializer
 
