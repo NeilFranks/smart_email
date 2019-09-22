@@ -9,5 +9,5 @@ def home(request):
     return render(request, "frontend/home.html")
 
 
-def base(request):
-    return render(request, "frontend/registration/base.html")
+def verify(request):
+    return render(request, "googlea247c86106d85d33.html")
