@@ -6,7 +6,8 @@ import { addCatAlgPair } from "../../actions/catAlgPairs";
 export class Form extends Component {
   state = {
     category: "",
-    algorithm: ""
+    emails: [],
+    common_words: [],
   };
 
   static propTypes = {
@@ -17,17 +18,18 @@ export class Form extends Component {
 
   onSubmit = e => {
     e.preventDefault();
-    const { category, algorithm } = this.state;
-    const catAlgPair = { category, algorithm };
+    const { category, emails, common_words } = this.state;
+    const catAlgPair = { category, emails, common_words };
     this.props.addCatAlgPair(catAlgPair);
     this.setState({
       category: "",
-      algorithm: ""
+      emails: [],
+      common_words: []
     });
   };
 
   render() {
-    const { category, algorithm } = this.state;
+    const { category, emails, common_words } = this.state;
     return (
       <div className="card card-body mt-4 mb-4">
         <h2>Add Category</h2>
@@ -43,13 +45,23 @@ export class Form extends Component {
             />
           </div>
           <div className="form-group">
-            <label>Algorithm</label>
+            <label>Emails</label>
             <input
               className="form-control"
               type="text"
-              name="algorithm"
+              name="emails"
               onChange={this.onChange}
-              value={algorithm}
+              value={emails}
+            />
+          </div>
+          <div className="form-group">
+            <label>Most Common Words</label>
+            <input
+              className="form-control"
+              type="text"
+              name="common_words"
+              onChange={this.onChange}
+              value={common_words}
             />
           </div>
           <div className="form-group">

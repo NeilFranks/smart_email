@@ -22,7 +22,8 @@ export class CatAlgPairs extends Component {
           <thead>
             <tr>
               <th>Category</th>
-              <th>Algorithm</th>
+              <th>Emails</th>
+              <th>Common Words</th>
               {/* for deletion: */}
               <th />
             </tr>
@@ -31,7 +32,8 @@ export class CatAlgPairs extends Component {
             {this.props.catAlgPairs.map(catAlgPair => (
               <tr key={catAlgPair.id}>
                 <td>{catAlgPair.category}</td>
-                <td>{catAlgPair.algorithm}</td>
+                <td>{catAlgPair.emails}</td>
+                <td>{catAlgPair.common_words}</td>
                 <td>
                   <button
                     onClick={this.props.deleteCatAlgPair.bind(
