@@ -1,13 +1,13 @@
-from .models import CategoryAlgorithmPair
 from rest_framework import viewsets, permissions
-from .serializers import CatAlgSerializer
+from .models import TestObject
+from .serializers import CatAlgSerializer, TestObjectSerializer
 
 # CategoryAlgorithmPair Viewset
 
 
 class CatAlgViewSet(viewsets.ModelViewSet):
     permissions_classes = [
-        permissions.IsAuthenticated,  # need to restrict this permission
+        permissions.IsAuthenticated,
     ]
 
     serializer_class = CatAlgSerializer
@@ -17,3 +17,11 @@ class CatAlgViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+
+
+class TestObjectViewSet(viewsets.ModelViewSet):
+    queryset = TestObject.objects.all()  # get all catAlgs
+    permissions_classes = [
+        permissions.AllowAny  # need to restrict this permission
+    ]
+    serializer_class = TestObjectSerializer
