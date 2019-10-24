@@ -8,3 +8,9 @@ class CatAlgSerializer(serializers.ModelSerializer):
     class Meta:
         model = CategoryAlgorithmPair
         fields = ('__all__')
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ('__all__')
+
