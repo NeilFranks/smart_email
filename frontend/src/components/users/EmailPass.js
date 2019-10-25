@@ -17,12 +17,12 @@ export class EmailPass extends Component {
   render() {
     return (
       <Fragment>
-        <h2>Emails and Passwords</h2>
+        <h2>Connected Email Addresses and Passwords</h2>
         <table className="table table-striped">
           <thead>
             <tr>
-              <th>Email</th>
-              <th>Password</th>
+              <th>Email Address</th>
+              <th>App Password</th>
               {/* for deletion: */}
               <th />
             </tr>

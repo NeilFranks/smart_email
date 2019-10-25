@@ -30,7 +30,7 @@ export class Form extends Component {
     const { email, appPass } = this.state;
     return (
       <div className="card card-body mt-4 mb-4">
-        <h2>Add Email</h2>
+        <h2>Connect an Email Address</h2>
         <form onSubmit={this.onSubmit}>
           <div className="form-group">
             <label>Email Address</label>
@@ -43,7 +43,7 @@ export class Form extends Component {
             />
           </div>
           <div className="form-group">
-            <label>Password</label>
+            <label>App Password</label>
             <input
               className="form-control"
               type="text"
