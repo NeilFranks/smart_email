@@ -27,7 +27,7 @@ const alertOptions = {
   position: "bottom center"
 };
 
-class EmailConnect extends Component {
+class EmailView extends Component {
   componentDidMount() {
     store.dispatch(loadUser());
   }
@@ -59,4 +59,4 @@ class EmailConnect extends Component {
   }
 }
 
-ReactDOM.render(<EmailConnect />, document.getElementById("emailConnect"));
+ReactDOM.render(<EmailView />, document.getElementById("emailView"));
