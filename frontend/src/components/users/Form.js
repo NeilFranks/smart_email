@@ -1,55 +1,55 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
-import { addCatAlgPair } from "../../actions/catAlgPairs";
+import { addEmailPass } from "../../actions/emailPass";
 
 export class Form extends Component {
   state = {
-    category: "",
-    algorithm: ""
+    email: "",
+    appPass: ""
   };
 
   static propTypes = {
-    addCatAlgPair: PropTypes.func.isRequired
+    addEmailPass: PropTypes.func.isRequired
   };
 
   onChange = e => this.setState({ [e.target.name]: e.target.value });
 
   onSubmit = e => {
     e.preventDefault();
-    const { category, algorithm } = this.state;
-    const catAlgPair = { category, algorithm };
-    this.props.addCatAlgPair(catAlgPair);
+    const { email, appPass } = this.state;
+    const emailPass = { email, appPass };
+    this.props.addEmailPass(emailPass);
     this.setState({
-      category: "",
-      algorithm: ""
+      email: "",
+      appPass: ""
     });
   };
 
   render() {
-    const { category, algorithm } = this.state;
+    const { email, appPass } = this.state;
     return (
       <div className="card card-body mt-4 mb-4">
-        <h2>Add Category</h2>
+        <h2>Add Email</h2>
         <form onSubmit={this.onSubmit}>
           <div className="form-group">
-            <label>Category Name</label>
+            <label>Email Address</label>
             <input
               className="form-control"
               type="text"
-              name="category"
+              name="email"
               onChange={this.onChange}
-              value={category}
+              value={email}
             />
           </div>
           <div className="form-group">
-            <label>Algorithm</label>
+            <label>Password</label>
             <input
               className="form-control"
               type="text"
-              name="algorithm"
+              name="appPass"
               onChange={this.onChange}
-              value={algorithm}
+              value={appPass}
             />
           </div>
           <div className="form-group">
@@ -65,5 +65,5 @@ export class Form extends Component {
 
 export default connect(
   null,
-  { addCatAlgPair }
+  { addEmailPass }
 )(Form);

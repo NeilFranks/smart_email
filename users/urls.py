@@ -1,7 +1,7 @@
 from rest_framework import routers
-from .api import CatAlgViewSet
+from .api import EmailPassViewSet
 
 router = routers.DefaultRouter()
-router.register('api/catAlg', CatAlgViewSet, 'catAlg')
+router.register('api/ep', EmailPassViewSet, 'ep')
 
 urlpatterns = router.urls

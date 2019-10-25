@@ -1,10 +1,8 @@
 from rest_framework import serializers
-from .models import CategoryAlgorithmPair
-
-# CategoryAlgorithmPair Serializer
+from .models import EmailPass
 
 
-class CatAlgSerializer(serializers.ModelSerializer):
+class EmailPassSerializer(serializers.ModelSerializer):
     class Meta:
-        model = CategoryAlgorithmPair
+        model = EmailPass
         fields = ('__all__')

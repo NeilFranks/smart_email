@@ -1,12 +1,12 @@
 import React, { Fragment } from "react";
 import Form from "./Form";
-import CatAlgPairs from "./CatAlgPairs";
+import EmailPass from "./EmailPass";
 
 export default function Dashboard() {
   return (
     <Fragment>
       <Form />
-      <CatAlgPairs />
+      <EmailPass />
     </Fragment>
   );
 }
