@@ -55,4 +55,4 @@ class EmailConnect extends Component {
   }
 }
 
-ReactDOM.render(<EmailConnect />, document.getElementById("app"));
+ReactDOM.render(<EmailConnect />, document.getElementById("emailConnect"));
