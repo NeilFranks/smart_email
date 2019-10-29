@@ -3,5 +3,6 @@ from . import views
 urlpatterns = [
     path('', views.home),
     path('base', views.base),
-    path('emailConnect', views.emailConnect)
+    path('emailConnect', views.emailConnect),
+    path('emailView', views.emailView)
 ]

@@ -15,3 +15,7 @@ def base(request):
 
 def emailConnect(request):
     return render(request, "frontend/emailConnect.html")
+
+
+def emailView(request):
+    return render(request, "frontend/emailView.html")

@@ -11,7 +11,7 @@ import { Provider as AlertProvider } from "react-alert";
 import AlertTemplate from "react-alert-template-basic";
 
 import Header from "./layout/Header";
-import ConnectEmailDashboard from "./users/ConnectEmailDashboard";
+import ViewEmailDashboard from "./users/ViewEmailDashboard";
 import Alerts from "./layout/Alerts";
 import Login from "./accounts/Login";
 import Register from "./accounts/Register";
@@ -42,11 +42,7 @@ class EmailView extends Component {
               <Alerts />
               <div className="container">
                 <Switch>
-                  <PrivateRoute
-                    exact
-                    path="/"
-                    component={ConnectEmailDashboard}
-                  />
+                  <PrivateRoute exact path="/" component={ViewEmailDashboard} />
                   <Route exact path="/register" component={Register} />
                   <Route exact path="/login" component={Login} />
                 </Switch>
