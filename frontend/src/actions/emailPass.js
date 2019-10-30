@@ -6,7 +6,7 @@ import { GET_EMAILPASS, DELETE_EMAILPASS, ADD_EMAILPASS } from "./types";
 
 export const getEmailPass = () => (dispatch, getState) => {
   axios
-    .get("/api/ep/", tokenConfig(getState))
+    .get("/api/et/", tokenConfig(getState))
     .then(res => {
       dispatch({
         type: GET_EMAILPASS,
@@ -20,7 +20,7 @@ export const getEmailPass = () => (dispatch, getState) => {
 
 export const deleteEmailPass = id => (dispatch, getState) => {
   axios
-    .delete(`/api/ep/${id}/`, tokenConfig(getState))
+    .delete(`/api/et/${id}/`, tokenConfig(getState))
     .then(res => {
       dispatch(createMessage({ deleteEmail: "Email Address Deleted" }));
       dispatch({
@@ -33,7 +33,7 @@ export const deleteEmailPass = id => (dispatch, getState) => {
 
 export const addEmailPass = EmailPass => (dispatch, getState) => {
   axios
-    .post("/api/ep/", EmailPass, tokenConfig(getState))
+    .post("/api/et/", EmailPass, tokenConfig(getState))
     .then(res => {
       dispatch(createMessage({ addEmail: "Email Address Added" }));
       dispatch({

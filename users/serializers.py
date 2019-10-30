@@ -1,8 +1,8 @@
 from rest_framework import serializers
-from .models import EmailPass
+from .models import EmailToken
 
 
-class EmailPassSerializer(serializers.ModelSerializer):
+class EmailTokenSerializer(serializers.ModelSerializer):
     class Meta:
-        model = EmailPass
+        model = EmailToken
         fields = ('__all__')

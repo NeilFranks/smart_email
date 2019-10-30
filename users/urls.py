@@ -1,7 +1,7 @@
 from rest_framework import routers
-from .api import EmailPassViewSet
+from .api import EmailTokenViewSet
 
 router = routers.DefaultRouter()
-router.register('api/ep', EmailPassViewSet, 'ep')
+router.register('api/et', EmailTokenViewSet, 'et')
 
 urlpatterns = router.urls

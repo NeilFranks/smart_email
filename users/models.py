@@ -2,8 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
-class EmailPass(models.Model):
-    email = models.CharField(max_length=100)
-    appPass = models.CharField(max_length=100)
+class EmailToken(models.Model):
+    emailToken = models.TextField()
     owner = models.ForeignKey(
-        User, related_name="emailPass", on_delete=models.CASCADE, null=True)
+        User, related_name="emailToken", on_delete=models.CASCADE, null=True)

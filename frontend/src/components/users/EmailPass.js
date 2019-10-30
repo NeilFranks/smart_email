@@ -30,8 +30,7 @@ export class EmailPass extends Component {
           <tbody>
             {this.props.emailPass.map(emailPass => (
               <tr key={emailPass.id}>
-                <td>{emailPass.email}</td>
-                <td>{emailPass.appPass}</td>
+                <td>{emailPass.emailToken}</td>
                 <td>
                   <button
                     onClick={this.props.deleteEmailPass.bind(
