@@ -1,8 +1,8 @@
 from rest_framework import serializers
-from .models import EmailToken
+from .models import ConnectedEmail
 
 
-class EmailTokenSerializer(serializers.ModelSerializer):
+class ConnectedEmailSerializer(serializers.ModelSerializer):
     class Meta:
-        model = EmailToken
+        model = ConnectedEmail
         fields = ('__all__')

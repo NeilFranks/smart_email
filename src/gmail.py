@@ -1,66 +1,103 @@
 from __future__ import print_function
-import pickle
-import os.path
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
-from google.auth.transport.requests import Request
-from credsApi import retrieve_creds
+from credsApi import add_account, retrieve_accounts
+from emailData import get_body
 
 # If modifying these scopes, delete the stored token.
 SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
 
 
-def main():
-    creds = None
-    # The stored token stores the user's access and refresh tokens, and is
-    # created automatically when the authorization flow completes for the first
-    # time.
-    if os.path.exists('token.pickle'):
-        with open('token.pickle', 'rb') as token:
-            creds = pickle.load(token)
+def connect_new_account(app_token):
+    flow = InstalledAppFlow.from_client_secrets_file(
+        'credentials.json', SCOPES)
+    creds = flow.run_local_server(port=0)
 
-    # r = requests.get('http://127.0.0.1:8000/api/et/',
-    #                  headers={'Authorization': 'Token 11997d9aed82385d4811947006edd0ea3af2e9a75881ed5d57da13285b9aa42c'})
-    # if r.content:
-    #     credString = r.content[0]
-    #     with tempfile.NamedTemporaryFile() as temp:
-    #         temp.write(credString)
-    #         creds = pickle.load(temp)
-    #         temp.close()
-
-    # If there are no (valid) credentials available, let the user log in.
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                'credentials.json', SCOPES)
-            creds = flow.run_local_server(port=0)
-        # Save the credentials for the next run
-        with open('token.pickle', 'wb') as token:
-            pickle.dump(creds, token)
-
-    tok = "05d4d54fa8b5747eb509c4a29e0a6d8a21dd8a963153b7642493af3d3e2d1f84"
-    buh = retrieve_creds(tok)
-
+    # get what you need from the profile
     service = build('gmail', 'v1', credentials=creds)
+    profile = service.users().getProfile(userId='me').execute()
+    address = profile.get('emailAddress')
 
-    # Call the Gmail API
-    results = service.users().messages().list(userId='me').execute()
-    labels = results.get('messages', [])
+    # call api to add creads to the associated user
+    add_account(creds, address, app_token)
 
-    if not labels:
-        print('No labels found.')
-    else:
-        print('Labels:')
-        for label in labels:
-            message = service.users().messages().get(
-                userId='me', id=label['id']).execute()
-            """
-            print(message)
-            print("")"""
+
+def get_single_email(address, email_id, app_token):
+    '''
+    Returns id, date (and time), from, and subject of the most recent n emails sent to the address.
+    '''
+    connections = retrieve_accounts(app_token)
+    for connection in connections:
+        if address == connection.get("address"):
+            # get access to emails
+            creds = connection.get("creds")
+            service = build('gmail', 'v1', credentials=creds)
+            results = service.users().messages().get(
+                userId='me', id=email_id, format='full').execute()
+
+            body = get_body(results.get('payload'))
+
+            return body
+        return None
+
+
+def get_email_details(address, n, app_token):
+    '''
+    Returns id, date (and time), from, and subject of the most recent n emails sent to the address.
+    '''
+    connections = retrieve_accounts(app_token)
+    for connection in connections:
+        if address == connection.get("address"):
+            # get access to emails
+            creds = connection.get("creds")
+            service = build('gmail', 'v1', credentials=creds)
+            results = service.users().messages().list(userId='me', maxResults=n).execute()
+            labels = results.get('messages', [])
+
+            detailsList = []
+            if not labels:
+                print('No labels found.')
+            else:
+                for label in labels:
+                    message = service.users().messages().get(
+                        userId='me', id=label['id'], format='metadata', metadataHeaders=['Date', 'From', 'Subject']).execute()
+
+                    # isolate the details
+                    myId = message.get('id')
+                    payload = message.get('payload')
+                    headers = payload.get('headers')
+
+                    for header in headers:
+                        if header.get('name') == 'Date':
+                            date = header.get('value')
+                        if header.get('name') == 'From':
+                            sender = header.get('value')
+                        if header.get('name') == 'Subject':
+                            subject = header.get('value')
+
+                    detailsList.append(
+                        {'id': myId, 'date': date, 'from': sender, 'subject': subject})
+            return detailsList
+        return []
+
+
+def get_connected_addresses(app_token):
+    '''
+    Returns list of email addresses associated with the user
+    '''
+    connections = retrieve_accounts(app_token)
+
+    addressList = []
+    for connection in connections:
+        address = connection.get("address")
+        if address and "@" in address:  # TODO: better input validation
+            addressList.append(address)
+
+    return addressList
 
 
 if __name__ == '__main__':
-    main()
-    print("done")
+    tok = "e29bb5c2b71bd8d0f5a5d6674887b649655d917d28a8666d145a519278f33478"
+    bil = get_email_details("neilcapstonetest@gmail.com", 2, tok)
+    hum = get_single_email("neilcapstonetest@gmail.com",
+                           '16e1ffd1248982ac', tok)

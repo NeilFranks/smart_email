@@ -1,7 +1,7 @@
 from rest_framework import routers
-from .api import EmailTokenViewSet
+from .api import ConnectedEmailViewSet
 
 router = routers.DefaultRouter()
-router.register('api/et', EmailTokenViewSet, 'et')
+router.register('api/et', ConnectedEmailViewSet, 'et')
 
 urlpatterns = router.urls
