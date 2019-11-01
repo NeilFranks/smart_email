@@ -3,6 +3,8 @@ from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from .credsApi import add_account, retrieve_accounts
 from .emailData import get_body
+import email
+import base64
 
 # If modifying these scopes, delete the stored token.
 SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
@@ -35,12 +37,20 @@ def get_single_email(address, email_id, app_token):
             creds = connection.get("creds")
             service = build('gmail', 'v1', credentials=creds)
             results = service.users().messages().get(
-                userId='me', id=email_id, format='full').execute()
+                userId='me', id=email_id, format='raw').execute()
 
-            body = get_body(results.get('payload'))
-
-            return body
-        return None
+            # body = get_body(results.get('payload'))
+            msg_str = base64.urlsafe_b64decode(results['raw'].encode('ASCII'))
+            mime_msg = email.message_from_bytes(msg_str)
+            messageMainType = mime_msg.get_content_maintype()
+            if messageMainType == 'multipart':
+                for part in mime_msg.get_payload():
+                    if part.get_content_maintype() == 'text':
+                        return part.get_payload()
+                return ""
+            elif messageMainType == 'text':
+                return mime_msg.get_payload()
+    return None
 
 
 def get_email_details(address, n, app_token):
