@@ -2,7 +2,6 @@ from __future__ import print_function
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from .credsApi import add_account, retrieve_accounts
-from .emailData import get_body
 import email
 import base64
 
