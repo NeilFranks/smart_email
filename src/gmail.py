@@ -1,8 +1,8 @@
 from __future__ import print_function
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
-from credsApi import add_account, retrieve_accounts
-from emailData import get_body
+from .credsApi import add_account, retrieve_accounts
+from .emailData import get_body
 
 # If modifying these scopes, delete the stored token.
 SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
@@ -21,10 +21,12 @@ def connect_new_account(app_token):
     # call api to add creads to the associated user
     add_account(creds, address, app_token)
 
+    return address
+
 
 def get_single_email(address, email_id, app_token):
     '''
-    Returns id, date (and time), from, and subject of the most recent n emails sent to the address.
+    Returns the body text of the given email send to the given address
     '''
     connections = retrieve_accounts(app_token)
     for connection in connections:
@@ -60,7 +62,8 @@ def get_email_details(address, n, app_token):
             else:
                 for label in labels:
                     message = service.users().messages().get(
-                        userId='me', id=label['id'], format='metadata', metadataHeaders=['Date', 'From', 'Subject']).execute()
+                        userId='me', id=label['id'], format='metadata',
+                        metadataHeaders=['Date', 'From', 'Subject']).execute()
 
                     # isolate the details
                     myId = message.get('id')
@@ -76,9 +79,9 @@ def get_email_details(address, n, app_token):
                             subject = header.get('value')
 
                     detailsList.append(
-                        {'id': myId, 'date': date, 'from': sender, 'subject': subject})
+                        {'id': myId, 'date': date, 'sender': sender, 'subject': subject})
             return detailsList
-        return []
+    return []
 
 
 def get_connected_addresses(app_token):

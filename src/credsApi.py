@@ -12,8 +12,10 @@ def add_account(creds, address, app_token):
     '''
     # TODO: do input validation on address (needs to be an email address)
     stringCreds = codecs.encode(pickle.dumps(creds), "base64").decode()
+    print(app_token)
+    print(address)
     response = requests.post('http://127.0.0.1:8000/api/et/', headers={
-        'Authorization': "Token %s" % app_token}, json={'token': stringCreds, "address": address})
+        'Authorization': app_token}, json={'creds': stringCreds, "address": address})
     return response
 
 
@@ -25,7 +27,7 @@ def modify_account(idx, creds, app_token):
     '''
     stringCreds = codecs.encode(pickle.dumps(creds), "base64").decode()
     response = requests.put('http://127.0.0.1:8000/api/et/%s/' % idx, headers={
-        'Authorization': "Token %s" % app_token}, json={'token': stringCreds})
+        'Authorization': app_token}, json={'creds': stringCreds})
     return response
 
 
@@ -37,7 +39,7 @@ def retrieve_accounts(app_token):
     '''
     response = requests.get('http://127.0.0.1:8000/api/et/',
                             headers={
-                                'Authorization': "Token %s" % app_token})
+                                'Authorization': app_token})
 
     if response.status_code == 200:
         accountList = []

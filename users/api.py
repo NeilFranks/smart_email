@@ -1,5 +1,7 @@
+from src.gmail import connect_new_account, get_single_email, get_email_details, get_connected_addresses
+from rest_framework.response import Response
 from rest_framework import viewsets, permissions
-from .serializers import ConnectedEmailSerializer
+from .serializers import ConnectNewEmailSerializer, ConnectNewAccountSerializer, SingleEmailSerializer, EmailDetailsSerializer, ConnectedAddressesSerializer
 
 
 class ConnectedEmailViewSet(viewsets.ModelViewSet):
@@ -7,10 +9,74 @@ class ConnectedEmailViewSet(viewsets.ModelViewSet):
         permissions.IsAuthenticated,
     ]
 
-    serializer_class = ConnectedEmailSerializer
+    serializer_class = ConnectNewEmailSerializer
 
     def get_queryset(self):
         return self.request.user.connectedEmail.all()
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+
+
+class ConnectNewAccountViewSet(viewsets.GenericViewSet):
+    permissions_classes = [
+        permissions.IsAuthenticated,
+    ]
+
+    serializer_class = ConnectNewAccountSerializer
+
+    def list(self, request):
+        token = request.META.get('HTTP_AUTHORIZATION')
+        address = {"address": connect_new_account(token)}
+        results = ConnectNewAccountSerializer(address).data
+        return Response(results)
+
+
+class SingleEmailViewSet(viewsets.GenericViewSet):
+    permissions_classes = [
+        permissions.IsAuthenticated,
+    ]
+
+    serializer_class = SingleEmailSerializer
+
+    def list(self, request):
+        token = request.META.get('HTTP_AUTHORIZATION')
+        data = request.data
+        address = data.get("address")
+        email_id = data.get("email_id")
+
+        body = {"body": get_single_email(address, email_id, token)}
+        results = SingleEmailSerializer(body).data
+        return Response(results)
+
+
+class EmailDetailsViewSet(viewsets.GenericViewSet):
+    permissions_classes = [
+        permissions.IsAuthenticated,
+    ]
+
+    serializer_class = EmailDetailsSerializer
+
+    def list(self, request):
+        token = request.META.get('HTTP_AUTHORIZATION')
+        data = request.data
+        address = data.get("address")
+        n = data.get("n")
+
+        detailsList = {"detailsList": get_email_details(address, n, token)}
+        results = EmailDetailsSerializer(detailsList).data
+        return Response(results)
+
+
+class ConnectedAddressesViewSet(viewsets.GenericViewSet):
+    permissions_classes = [
+        permissions.IsAuthenticated,
+    ]
+
+    serializer_class = ConnectedAddressesSerializer
+
+    def list(self, request):
+        token = request.META.get('HTTP_AUTHORIZATION')
+        addresses = {"addresses": get_connected_addresses(token)}
+        results = ConnectedAddressesSerializer(addresses).data
+        return Response(results)
