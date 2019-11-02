@@ -27,9 +27,9 @@ class ConnectNewAccountViewSet(viewsets.GenericViewSet):
 
     def list(self, request):
         token = request.META.get('HTTP_AUTHORIZATION')
-        address = {"address": connect_new_account(token)}
-        results = ConnectNewAccountSerializer(address).data
-        return Response(results)
+        content = {"content": connect_new_account(token)}
+        results = ConnectNewAccountSerializer(content).data
+        return Response(results.get("content"))
 
 
 class SingleEmailViewSet(viewsets.GenericViewSet):

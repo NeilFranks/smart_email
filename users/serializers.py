@@ -9,7 +9,7 @@ class ConnectNewEmailSerializer(serializers.ModelSerializer):
 
 
 class ConnectNewAccountSerializer(serializers.Serializer):
-    address = serializers.CharField()
+    content = serializers.DictField()
 
 
 class SingleEmailSerializer(serializers.Serializer):

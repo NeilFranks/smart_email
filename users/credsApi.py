@@ -12,11 +12,10 @@ def add_account(creds, address, app_token):
     '''
     # TODO: do input validation on address (needs to be an email address)
     stringCreds = codecs.encode(pickle.dumps(creds), "base64").decode()
-    print(app_token)
-    print(address)
     response = requests.post('http://127.0.0.1:8000/api/et/', headers={
         'Authorization': app_token}, json={'creds': stringCreds, "address": address})
-    return response
+    content = json.loads(response.content)
+    return content
 
 
 def modify_account(idx, creds, app_token):

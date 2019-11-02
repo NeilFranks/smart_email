@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
-import { addEmailToken } from "../../actions/emailToken";
+import { newEmailToken } from "../../actions/emailToken";
 
 export class Form extends Component {
   state = {
@@ -9,7 +9,7 @@ export class Form extends Component {
   };
 
   static propTypes = {
-    addEmailToken: PropTypes.func.isRequired
+    newEmailToken: PropTypes.func.isRequired
   };
 
   onChange = e => this.setState({ [e.target.name]: e.target.value });
@@ -18,8 +18,9 @@ export class Form extends Component {
     e.preventDefault();
     const { address } = this.state;
     const emailToken = { address };
-    this.props.addEmailToken(emailToken);
+    this.props.newEmailToken(emailToken);
     this.setState({
+      creds: "",
       address: ""
     });
   };
@@ -42,5 +43,5 @@ export class Form extends Component {
 
 export default connect(
   null,
-  { addEmailToken }
+  { newEmailToken }
 )(Form);

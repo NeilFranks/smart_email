@@ -19,10 +19,10 @@ def connect_new_account(app_token):
     profile = service.users().getProfile(userId='me').execute()
     address = profile.get('emailAddress')
 
-    # call api to add creads to the associated user
-    add_account(creds, address, app_token)
+    # call api to add creds to the associated user
+    content = add_account(creds, address, app_token)
 
-    return address
+    return content
 
 
 def get_single_email(address, email_id, app_token):
@@ -109,7 +109,7 @@ def get_connected_addresses(app_token):
 
 
 if __name__ == '__main__':
-    tok = "e29bb5c2b71bd8d0f5a5d6674887b649655d917d28a8666d145a519278f33478"
+    tok = "452b8c9c861bb56d20df5d54b71931db8b04dbe9108441c1b35a10adb2e13d06"
     bil = get_email_details("neilcapstonetest@gmail.com", 2, tok)
     hum = get_single_email("neilcapstonetest@gmail.com",
                            '16e1ffd1248982ac', tok)

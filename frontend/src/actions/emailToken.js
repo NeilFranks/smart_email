@@ -4,6 +4,21 @@ import { tokenConfig } from "./auth";
 
 import { GET_EMAILTOKEN, DELETE_EMAILTOKEN, ADD_EMAILTOKEN } from "./types";
 
+export const newEmailToken = () => (dispatch, getState) => {
+  axios
+    .get("/api/connectNewEmail/", tokenConfig(getState))
+    .then(res => {
+      dispatch(createMessage({ addEmail: "Added " }));
+      dispatch({
+        type: ADD_EMAILTOKEN,
+        payload: res.data
+      });
+    })
+    .catch(err =>
+      dispatch(returnErrors(err.response.data, err.response.status))
+    );
+};
+
 export const getEmailToken = () => (dispatch, getState) => {
   axios
     .get("/api/et/", tokenConfig(getState))
@@ -29,19 +44,4 @@ export const deleteEmailToken = id => (dispatch, getState) => {
       });
     })
     .catch(err => console.log(err));
-};
-
-export const addEmailToken = EmailToken => (dispatch, getState) => {
-  axios
-    .post("/api/et/", EmailToken, tokenConfig(getState))
-    .then(res => {
-      dispatch(createMessage({ addEmail: "Email Address Added" }));
-      dispatch({
-        type: ADD_EMAILTOKEN,
-        payload: res.data
-      });
-    })
-    .catch(err =>
-      dispatch(returnErrors(err.response.data, err.response.status))
-    );
 };

@@ -5,6 +5,7 @@ import EmailToken from "./EmailToken";
 export default function ConnectEmailDashboard() {
   return (
     <Fragment>
+      <Form />
       <EmailToken />
     </Fragment>
   );
