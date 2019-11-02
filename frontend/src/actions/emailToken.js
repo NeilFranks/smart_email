@@ -4,7 +4,7 @@ import { tokenConfig } from "./auth";
 
 import { GET_EMAILTOKEN, DELETE_EMAILTOKEN, ADD_EMAILTOKEN } from "./types";
 
-export const newEmailToken = () => (dispatch, getState) => {
+export const addEmailToken = () => (dispatch, getState) => {
   axios
     .get("/api/connectNewEmail/", tokenConfig(getState))
     .then(res => {

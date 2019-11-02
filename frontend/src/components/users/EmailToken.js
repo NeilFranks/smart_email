@@ -1,11 +1,16 @@
 import React, { Component, Fragment } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
-import { getEmailToken, deleteEmailToken } from "../../actions/emailToken";
+import {
+  addEmailToken,
+  getEmailToken,
+  deleteEmailToken
+} from "../../actions/emailToken";
 
 export class EmailToken extends Component {
   static propTypes = {
     emailToken: PropTypes.array.isRequired,
+    addEmailToken: PropTypes.func.isRequired,
     getEmailToken: PropTypes.func.isRequired,
     deleteEmailToken: PropTypes.func.isRequired
   };
@@ -17,12 +22,10 @@ export class EmailToken extends Component {
   render() {
     return (
       <Fragment>
-        <h2>Connected Email Addresses</h2>
         <table className="table table-striped">
           <thead>
             <tr>
-              <th>Email Address</th>
-
+              <th>Connected Accounts</th>
               {/* for deletion: */}
               <th />
             </tr>
@@ -46,6 +49,20 @@ export class EmailToken extends Component {
               </tr>
             ))}
           </tbody>
+          <tfoot>
+            <tr>
+              <td />
+              <td>
+                <button
+                  onClick={this.props.addEmailToken.bind(this)}
+                  className="btn btn-primary btn-sm"
+                >
+                  {" "}
+                  Add new account
+                </button>
+              </td>
+            </tr>
+          </tfoot>
         </table>
       </Fragment>
     );
@@ -58,5 +75,5 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  { getEmailToken, deleteEmailToken }
+  { getEmailToken, deleteEmailToken, addEmailToken }
 )(EmailToken);
