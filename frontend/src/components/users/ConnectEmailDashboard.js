@@ -1,12 +1,11 @@
 import React, { Fragment } from "react";
 import Form from "./Form";
-import EmailPass from "./EmailPass";
+import EmailToken from "./EmailToken";
 
 export default function ConnectEmailDashboard() {
   return (
     <Fragment>
-      <Form />
-      <EmailPass />
+      <EmailToken />
     </Fragment>
   );
 }

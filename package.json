@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "webpack --mode development --watch ./frontend/src/emailView.js --output ./frontend/static/frontend/emailView.js",
+    "dev": "webpack --mode development --watch ./frontend/src/emailConnect.js --output ./frontend/static/frontend/emailConnect.js",
     "build": "webpack --mode production ./frontend/src/emailConnect.js --output ./frontend/static/frontend/emailConnect.js"
   },
   "keywords": [],

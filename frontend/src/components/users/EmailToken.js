@@ -1,41 +1,41 @@
 import React, { Component, Fragment } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
-import { getEmailPass, deleteEmailPass } from "../../actions/emailPass";
+import { getEmailToken, deleteEmailToken } from "../../actions/emailToken";
 
-export class EmailPass extends Component {
+export class EmailToken extends Component {
   static propTypes = {
-    emailPass: PropTypes.array.isRequired,
-    getEmailPass: PropTypes.func.isRequired,
-    deleteEmailPass: PropTypes.func.isRequired
+    emailToken: PropTypes.array.isRequired,
+    getEmailToken: PropTypes.func.isRequired,
+    deleteEmailToken: PropTypes.func.isRequired
   };
 
   componentDidMount() {
-    this.props.getEmailPass();
+    this.props.getEmailToken();
   }
 
   render() {
     return (
       <Fragment>
-        <h2>Connected Email Addresses and Passwords</h2>
+        <h2>Connected Email Addresses</h2>
         <table className="table table-striped">
           <thead>
             <tr>
               <th>Email Address</th>
-              <th>App Password</th>
+
               {/* for deletion: */}
               <th />
             </tr>
           </thead>
           <tbody>
-            {this.props.emailPass.map(emailPass => (
-              <tr key={emailPass.id}>
-                <td>{emailPass.emailToken}</td>
+            {this.props.emailToken.map(emailToken => (
+              <tr key={emailToken.id}>
+                <td>{emailToken.address}</td>
                 <td>
                   <button
-                    onClick={this.props.deleteEmailPass.bind(
+                    onClick={this.props.deleteEmailToken.bind(
                       this,
-                      emailPass.id
+                      emailToken.id
                     )}
                     className="btn btn-danger btn-sm"
                   >
@@ -53,10 +53,10 @@ export class EmailPass extends Component {
 }
 
 const mapStateToProps = state => ({
-  emailPass: state.emailPass.emailPass // get reducer, then get its actual emailPass
+  emailToken: state.emailToken.emailToken // get reducer, then get its actual et
 });
 
 export default connect(
   mapStateToProps,
-  { getEmailPass, deleteEmailPass }
-)(EmailPass);
+  { getEmailToken, deleteEmailToken }
+)(EmailToken);
