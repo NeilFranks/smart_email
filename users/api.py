@@ -58,10 +58,14 @@ class EmailDetailsViewSet(viewsets.GenericViewSet):
     serializer_class = EmailDetailsSerializer
 
     def list(self, request):
-        token = request.META.get('HTTP_AUTHORIZATION')
+        pass
+
+    def post(self, request):
         data = request.data
         address = data.get("address")
         n = data.get("n")
+        headers = data.get("headers")
+        token = headers.get("Authorization")
 
         detailsList = {"detailsList": get_email_details(address, n, token)}
         results = EmailDetailsSerializer(detailsList).data
