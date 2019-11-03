@@ -9,7 +9,7 @@ export const getEmailDetails = () => (dispatch, getState) => {
     .post("/api/emailDetails/", tokenConfig(getState), {
       data: {
         address: "neilmichaelfranks@gmail.com",
-        n: "5"
+        n: "10"
       }
     })
     .then(res => {

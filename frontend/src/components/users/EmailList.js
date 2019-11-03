@@ -16,15 +16,37 @@ export class EmailList extends Component {
   render() {
     return (
       <Fragment>
-        <table className="table table-striped">
+        <table className="table">
+          <thead>
+            <tr>
+              <th>From</th>
+              <th>Subject</th>
+              <th>Body</th>
+              <th>Received</th>
+            </tr>
+          </thead>
           <tbody>
-            {this.props.emailDetails.map(emailDetails => (
-              <tr key={emailDetails.id}>
-                <td>{emailDetails.sender}</td>
-                <td>{emailDetails.subject}</td>
-                <td>{emailDetails.date}</td>
-              </tr>
-            ))}
+            {this.props.emailDetails.map(emailDetails =>
+              emailDetails.unread ? (
+                <tr key={emailDetails.id} bgcolor="#fff">
+                  <td>
+                    <strong>{emailDetails.sender}</strong>
+                  </td>
+                  <td>
+                    <strong>{emailDetails.subject}</strong>
+                  </td>
+                  <td>{emailDetails.snippet}</td>
+                  <td>{emailDetails.date}</td>
+                </tr>
+              ) : (
+                <tr key={emailDetails.id} bgcolor="#eee">
+                  <td>{emailDetails.sender}</td>
+                  <td>{emailDetails.subject}</td>
+                  <td>{emailDetails.snippet}</td>
+                  <td>{emailDetails.date}</td>
+                </tr>
+              )
+            )}
           </tbody>
         </table>
       </Fragment>

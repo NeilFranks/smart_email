@@ -76,19 +76,29 @@ def get_email_details(address, n, app_token):
 
                     # isolate the details
                     myId = message.get('id')
+                    labels = message.get('labelIds')
                     payload = message.get('payload')
                     headers = payload.get('headers')
 
                     for header in headers:
-                        if header.get('name') == 'Date':
+                        name = header.get('name')
+                        if name == 'Date':
                             date = header.get('value')
-                        if header.get('name') == 'From':
+                        if name == 'From':
                             sender = header.get('value')
-                        if header.get('name') == 'Subject':
+                        if name == 'Subject':
                             subject = header.get('value')
 
+                    # sender looks like "name <address@gmail.com>". We just want the first part
+                    sender = sender.split("<")[0]
+
+                    # cut sender name down to 23 chars max
+                    if len(sender) > 23:
+                        sender = sender[0:20]+"..."
+                    snippet = message.get('snippet')[0:50]+"..."
+
                     detailsList.append(
-                        {'id': myId, 'date': date, 'sender': sender, 'subject': subject})
+                        {'id': myId, 'date': date, 'unread': 'UNREAD' in labels, 'sender': sender, 'snippet': snippet, 'subject': subject})
             return detailsList
     return []
 
