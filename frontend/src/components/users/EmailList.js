@@ -17,33 +17,47 @@ export class EmailList extends Component {
     return (
       <Fragment>
         <table className="table">
-          <thead>
-            <tr>
-              <th>From</th>
-              <th>Subject</th>
-              <th>Body</th>
-              <th>Received</th>
-            </tr>
-          </thead>
           <tbody>
             {this.props.emailDetails.map(emailDetails =>
               emailDetails.unread ? (
                 <tr key={emailDetails.id} bgcolor="#fff">
-                  <td>
+                  <td style={{ width: "20%" }}>
                     <strong>{emailDetails.sender}</strong>
                   </td>
-                  <td>
+                  <td
+                    style={{
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      width: "65%",
+                      maxWidth: "0"
+                    }}
+                  >
                     <strong>{emailDetails.subject}</strong>
+                    {snippetPrepend(emailDetails.snippet)}
                   </td>
-                  <td>{emailDetails.snippet}</td>
-                  <td>{emailDetails.date}</td>
+                  <td style={{ width: "15%" }} align="right">
+                    {dateString(new Date(emailDetails.date))}
+                  </td>
                 </tr>
               ) : (
                 <tr key={emailDetails.id} bgcolor="#eee">
-                  <td>{emailDetails.sender}</td>
-                  <td>{emailDetails.subject}</td>
-                  <td>{emailDetails.snippet}</td>
-                  <td>{emailDetails.date}</td>
+                  <td style={{ width: "20%" }}>{emailDetails.sender}</td>
+                  <td
+                    style={{
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      width: "65%",
+                      maxWidth: "0"
+                    }}
+                  >
+                    {emailDetails.subject}
+                    {snippetPrepend(emailDetails.snippet)}
+                  </td>
+                  <td style={{ width: "15%" }} align="right">
+                    {dateString(new Date(emailDetails.date))}
+                  </td>
                 </tr>
               )
             )}
@@ -57,6 +71,24 @@ export class EmailList extends Component {
 const mapStateToProps = state => ({
   emailDetails: state.emailDetails.emailDetails // get reducer, then get its actual et
 });
+
+const dateString = someDate => {
+  const today = new Date();
+  const isToday =
+    someDate.getDate() == today.getDate() &&
+    someDate.getMonth() == today.getMonth() &&
+    someDate.getFullYear() == today.getFullYear();
+
+  const newDate = isToday
+    ? someDate.toLocaleTimeString()
+    : someDate.toLocaleDateString();
+
+  return newDate;
+};
+
+const snippetPrepend = snippet => {
+  return " - ".concat(snippet);
+};
 
 export default connect(
   mapStateToProps,

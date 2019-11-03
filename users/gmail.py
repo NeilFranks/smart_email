@@ -94,8 +94,9 @@ def get_email_details(address, n, app_token):
 
                     # cut sender name down to 23 chars max
                     if len(sender) > 23:
-                        sender = sender[0:20]+"..."
-                    snippet = message.get('snippet')[0:50]+"..."
+                        sender = sender[0:20] + "..."
+
+                    snippet = message.get('snippet')
 
                     detailsList.append(
                         {'id': myId, 'date': date, 'unread': 'UNREAD' in labels, 'sender': sender, 'snippet': snippet, 'subject': subject})

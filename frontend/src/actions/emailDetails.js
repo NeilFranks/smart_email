@@ -3,6 +3,7 @@ import { createMessage, returnErrors } from "./messages";
 import { tokenConfig } from "./auth";
 
 import { GET_EMAILDETAILS } from "./types";
+import emailDetails from "../reducers/emailDetails";
 
 export const getEmailDetails = () => (dispatch, getState) => {
   axios
