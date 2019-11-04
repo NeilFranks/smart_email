@@ -4,6 +4,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from .credsApi import add_account, retrieve_accounts
 import email
 import base64
+import dateutil.parser
 
 # If modifying these scopes, delete the stored token.
 SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
@@ -52,56 +53,63 @@ def get_single_email(address, email_id, app_token):
     return None
 
 
-def get_email_details(address, n, app_token):
+def get_email_details(n, app_token):
     '''
     Returns id, date (and time), from, and subject of the most recent n emails sent to the address.
     '''
+
+    detailsList = []
+
     connections = retrieve_accounts(app_token)
     for connection in connections:
-        if address == connection.get("address"):
-            # get access to emails
-            creds = connection.get("creds")
-            service = build('gmail', 'v1', credentials=creds)
-            results = service.users().messages().list(userId='me', maxResults=n).execute()
-            labels = results.get('messages', [])
+        # get access to emails
+        creds = connection.get("creds")
+        service = build('gmail', 'v1', credentials=creds)
+        results = service.users().messages().list(userId='me', maxResults=n).execute()
+        labels = results.get('messages', [])
 
-            detailsList = []
-            if not labels:
-                print('No labels found.')
-            else:
-                for label in labels:
-                    message = service.users().messages().get(
-                        userId='me', id=label['id'], format='metadata',
-                        metadataHeaders=['Date', 'From', 'Subject']).execute()
+        if not labels:
+            print('No labels found.')
+        else:
+            for label in labels:
+                message = service.users().messages().get(
+                    userId='me', id=label['id'], format='metadata',
+                    metadataHeaders=['Date', 'From', 'Subject']).execute()
 
-                    # isolate the details
-                    myId = message.get('id')
-                    labels = message.get('labelIds')
-                    payload = message.get('payload')
-                    headers = payload.get('headers')
+                # isolate the details
+                myId = message.get('id')
+                labels = message.get('labelIds')
+                payload = message.get('payload')
+                headers = payload.get('headers')
 
-                    for header in headers:
-                        name = header.get('name')
-                        if name == 'Date':
-                            date = header.get('value')
-                        if name == 'From':
-                            sender = header.get('value')
-                        if name == 'Subject':
-                            subject = header.get('value')
+                for header in headers:
+                    name = header.get('name')
+                    if name == 'Date':
+                        date = header.get('value')
+                    if name == 'From':
+                        sender = header.get('value')
+                    if name == 'Subject':
+                        subject = header.get('value')
 
-                    # sender looks like "name <address@gmail.com>". We just want the first part
-                    sender = sender.split("<")[0]
+                # sender looks like "name <address@gmail.com>". We just want the first part
+                sender = sender.split("<")[0]
 
-                    # cut sender name down to 23 chars max
-                    if len(sender) > 23:
-                        sender = sender[0:20] + "..."
+                snippet = message.get('snippet')
 
-                    snippet = message.get('snippet')
+                detailsList.append(
+                    {
+                        'address': connection.get("address"),
+                        'id': myId,
+                        'date': date,
+                        'unread': 'UNREAD' in labels,
+                        'sender': sender,
+                        'snippet': snippet,
+                        'subject': subject
+                    })
+    detailsList.sort(key=lambda x:
+                     dateutil.parser.parse(x.get("date")), reverse=True)
 
-                    detailsList.append(
-                        {'id': myId, 'date': date, 'unread': 'UNREAD' in labels, 'sender': sender, 'snippet': snippet, 'subject': subject})
-            return detailsList
-    return []
+    return detailsList
 
 
 def get_connected_addresses(app_token):

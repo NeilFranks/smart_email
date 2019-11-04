@@ -21,7 +21,15 @@ export class EmailList extends Component {
             {this.props.emailDetails.map(emailDetails =>
               emailDetails.unread ? (
                 <tr key={emailDetails.id} bgcolor="#fff">
-                  <td style={{ width: "20%" }}>
+                  <td
+                    style={{
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      width: "20%",
+                      maxWidth: "0"
+                    }}
+                  >
                     <strong>{emailDetails.sender}</strong>
                   </td>
                   <td
@@ -36,13 +44,32 @@ export class EmailList extends Component {
                     <strong>{emailDetails.subject}</strong>
                     {snippetPrepend(emailDetails.snippet)}
                   </td>
-                  <td style={{ width: "15%" }} align="right">
+                  <td
+                    style={{
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      width: "15%",
+                      maxWidth: "0"
+                    }}
+                    align="right"
+                  >
                     {dateString(new Date(emailDetails.date))}
                   </td>
                 </tr>
               ) : (
                 <tr key={emailDetails.id} bgcolor="#eee">
-                  <td style={{ width: "20%" }}>{emailDetails.sender}</td>
+                  <td
+                    style={{
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      width: "20%",
+                      maxWidth: "0"
+                    }}
+                  >
+                    {emailDetails.sender}
+                  </td>
                   <td
                     style={{
                       whiteSpace: "nowrap",
@@ -55,7 +82,16 @@ export class EmailList extends Component {
                     {emailDetails.subject}
                     {snippetPrepend(emailDetails.snippet)}
                   </td>
-                  <td style={{ width: "15%" }} align="right">
+                  <td
+                    style={{
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      width: "15%",
+                      maxWidth: "0"
+                    }}
+                    align="right"
+                  >
                     {dateString(new Date(emailDetails.date))}
                   </td>
                 </tr>

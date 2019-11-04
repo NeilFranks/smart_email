@@ -1,8 +1,9 @@
 // reducer: evaluate action and send down certain state depending on action
-import { GET_EMAILDETAILS } from "../actions/types.js";
+import { GET_EMAILDETAILS, GET_CONNECTEDACCOUNTS } from "../actions/types.js";
 
 const initialState = {
-  emailDetails: []
+  emailDetails: [],
+  connectedAccounts: []
 };
 
 export default function(state = initialState, action) {
@@ -11,6 +12,11 @@ export default function(state = initialState, action) {
       return {
         ...state,
         emailDetails: action.payload
+      };
+    case GET_CONNECTEDACCOUNTS:
+      return {
+        ...state,
+        connectedAccounts: action.payload
       };
     default:
       return state;
