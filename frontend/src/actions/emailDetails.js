@@ -10,7 +10,7 @@ export const getEmailDetails = addressList => (dispatch, getState) => {
     .post("/api/emailDetails/", tokenConfig(getState), {
       data: {
         addressList: addressList,
-        n: "10"
+        n: "15"
       }
     })
     .then(res => {

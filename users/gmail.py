@@ -5,6 +5,7 @@ from .credsApi import add_account, retrieve_accounts
 import email
 import base64
 import dateutil.parser
+import multiprocessing as mp
 
 # If modifying these scopes, delete the stored token.
 SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
@@ -58,56 +59,26 @@ def get_email_details(n, app_token):
     Returns id, date (and time), from, and subject of the most recent n emails sent to the address.
     '''
 
+    connections = retrieve_accounts(app_token)
     detailsList = []
 
-    connections = retrieve_accounts(app_token)
-    for connection in connections:
-        # get access to emails
-        creds = connection.get("creds")
-        service = build('gmail', 'v1', credentials=creds)
-        results = service.users().messages().list(userId='me', maxResults=n).execute()
-        labels = results.get('messages', [])
+    # Step 1: Init multiprocessing.Pool()
+    pool = mp.Pool(mp.cpu_count())
 
-        if not labels:
-            print('No labels found.')
-        else:
-            for label in labels:
-                message = service.users().messages().get(
-                    userId='me', id=label['id'], format='metadata',
-                    metadataHeaders=['Date', 'From', 'Subject']).execute()
+    # Step 2: `pool.map` the `get_email_details_from_account()`
+    detailsList = pool.map(get_email_details_from_account, [(
+        connection, n) for connection in connections])  # Returns a list of lists
 
-                # isolate the details
-                myId = message.get('id')
-                labels = message.get('labelIds')
-                payload = message.get('payload')
-                headers = payload.get('headers')
+    # Flatten the list of lists
+    detailsList = [ent for sublist in detailsList for ent in sublist]
 
-                for header in headers:
-                    name = header.get('name')
-                    if name == 'Date':
-                        date = header.get('value')
-                    if name == 'From':
-                        sender = header.get('value')
-                    if name == 'Subject':
-                        subject = header.get('value')
+    # Step 3: Don't forget to close
+    pool.close()
 
-                # sender looks like "name <address@gmail.com>". We just want the first part
-                sender = sender.split("<")[0]
-
-                snippet = message.get('snippet')
-
-                detailsList.append(
-                    {
-                        'address': connection.get("address"),
-                        'id': myId,
-                        'date': date,
-                        'unread': 'UNREAD' in labels,
-                        'sender': sender,
-                        'snippet': snippet,
-                        'subject': subject
-                    })
-    detailsList.sort(key=lambda x:
-                     dateutil.parser.parse(x.get("date")), reverse=True)
+    if detailsList:
+        detailsList.sort(key=lambda x: dateutil.parser.parse(
+            x.get("date")), reverse=True)
+        detailsList = detailsList[0:int(n)]
 
     return detailsList
 
@@ -125,6 +96,61 @@ def get_connected_addresses(app_token):
             addressList.append(address)
 
     return addressList
+
+
+def get_email_details_from_account(connectionAndN):
+
+    detailsList = []
+
+    connection = connectionAndN[0]
+    n = connectionAndN[1]
+
+    # get access to emails
+    creds = connection.get("creds")
+    service = build('gmail', 'v1', credentials=creds)
+    results = service.users().messages().list(userId='me', maxResults=n).execute()
+    labels = results.get('messages', [])
+
+    if not labels:
+        print('No labels found.')
+    else:
+        for label in labels:
+            message = service.users().messages().get(
+                userId='me', id=label['id'], format='metadata',
+                metadataHeaders=['Date', 'From', 'Subject']).execute()
+
+            # isolate the details
+            myId = message.get('id')
+            labels = message.get('labelIds')
+            payload = message.get('payload')
+            headers = payload.get('headers')
+
+            for header in headers:
+                name = header.get('name')
+                if name == 'Date':
+                    date = header.get('value')
+                if name == 'From':
+                    sender = header.get('value')
+                if name == 'Subject':
+                    subject = header.get('value')
+
+            # sender looks like "name <address@gmail.com>". We just want the first part
+            sender = sender.split("<")[0]
+
+            snippet = message.get('snippet')
+
+            detailsList.append(
+                {
+                    'address': connection.get("address"),
+                    'id': myId,
+                    'date': date,
+                    'unread': 'UNREAD' in labels,
+                    'sender': sender,
+                    'snippet': snippet,
+                    'subject': subject
+                })
+
+    return detailsList
 
 
 if __name__ == '__main__':
