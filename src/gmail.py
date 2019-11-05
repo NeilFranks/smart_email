@@ -14,7 +14,7 @@ SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
 def connect_new_account(app_token):
     print("trying to do the thing")
     flow = InstalledAppFlow.from_client_secrets_file(
-        'credentials.json', SCOPES)
+        'google-credentials.json', SCOPES)
     creds = flow.run_local_server(port=0)
 
     print("creds: %s" % creds)
