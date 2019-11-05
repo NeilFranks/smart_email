@@ -54,7 +54,7 @@ def retrieve_accounts(app_token):
                     credsString.encode(), "base64"))
                 accountList.append(
                     {'id': idx, 'address': address, 'creds': creds})
-            except ValueError as e:
+            except ValueError:
                 # TODO: IDK where this prints out to.. if it prints at all. Should log somehow
                 print("creds '%s' could not be decoded" % credsString)
         return accountList
@@ -63,8 +63,9 @@ def retrieve_accounts(app_token):
 
 def baseURL():
     # in Procfile for heroku, BASE_URL should be set to `export BASE_URL=https://capstone-smart-email.herokuapp.com/`
-    baseURL = os.environ['BASE_URL']
-    if not baseURL:
+    try:
+        baseURL = os.environ['BASE_URL']
+    except KeyError:
         baseURL = 'http://127.0.0.1:8000'
 
     print("baseURL set to %s" % baseURL)
