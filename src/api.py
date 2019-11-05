@@ -26,8 +26,8 @@ class ConnectNewAccountViewSet(viewsets.GenericViewSet):
     serializer_class = ConnectNewAccountSerializer
 
     def list(self, request):
-        print("connecting new email")
         try:
+            data = request.data
             # auth is in headers like this when request comes from front end
             headers = data.get("headers")
             token = headers.get("Authorization")
