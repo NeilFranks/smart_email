@@ -63,8 +63,9 @@ def retrieve_accounts(app_token):
 
 def baseURL():
     # in Procfile for heroku, BASE_URL should be set to `export BASE_URL=https://capstone-smart-email.herokuapp.com/`
-    baseURL = os.environ.get("BASE_URL")
+    baseURL = os.environ['BASE_URL']
     if not baseURL:
         baseURL = 'http://127.0.0.1:8000'
 
+    print("baseURL set to %s" % baseURL)
     return baseURL
