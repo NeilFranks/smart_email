@@ -26,7 +26,14 @@ class ConnectNewAccountViewSet(viewsets.GenericViewSet):
     serializer_class = ConnectNewAccountSerializer
 
     def list(self, request):
-        token = request.META.get('HTTP_AUTHORIZATION')
+        print("connecting new email")
+        try:
+            # auth is in headers like this when request comes from front end
+            headers = data.get("headers")
+            token = headers.get("Authorization")
+        except AttributeError:
+            # auth is like this when request comes from postman
+            token = request.META.get('HTTP_AUTHORIZATION')
         content = {"content": connect_new_account(token)}
         results = ConnectNewAccountSerializer(content).data
         return Response(results.get("content"))
