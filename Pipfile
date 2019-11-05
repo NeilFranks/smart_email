@@ -14,6 +14,7 @@ djangorestframework = "*"
 django-rest-knox = "*"
 gunicorn = "*"
 django-heroku = "*"
+google-api-python-client = "*"
 
 [requires]
 python_version = "3.7"
