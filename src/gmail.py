@@ -12,17 +12,23 @@ SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
 
 
 def connect_new_account(app_token):
+    print("trying to do the thing")
     flow = InstalledAppFlow.from_client_secrets_file(
         'credentials.json', SCOPES)
     creds = flow.run_local_server(port=0)
 
+    print("creds: %s" % creds)
     # get what you need from the profile through GMail API
     service = build('gmail', 'v1', credentials=creds)
     profile = service.users().getProfile(userId='me').execute()
     address = profile.get('emailAddress')
 
+    print("built the service")
+
     # call api to add creds to the associated user
     content = add_account(creds, address, app_token)
+
+    print("added account")
 
     return content
 

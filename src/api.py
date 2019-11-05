@@ -34,8 +34,15 @@ class ConnectNewAccountViewSet(viewsets.GenericViewSet):
         except AttributeError:
             # auth is like this when request comes from postman
             token = request.META.get('HTTP_AUTHORIZATION')
+
+        print("token: %s" % token)
         content = {"content": connect_new_account(token)}
+
+        print("got content after connecting new account")
+
         results = ConnectNewAccountSerializer(content).data
+
+        print("got results bitch")
         return Response(results.get("content"))
 
 
