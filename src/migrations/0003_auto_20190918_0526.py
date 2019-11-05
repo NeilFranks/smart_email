@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
     atomic = False
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('users', '0002_auto_20190913_0736'),
+        ('src', '0002_auto_20190913_0736'),
     ]
 
     operations = [

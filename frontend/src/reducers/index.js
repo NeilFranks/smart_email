@@ -1,5 +1,4 @@
 import { combineReducers } from "redux";
-import users from "./users";
 import emailToken from "./emailToken";
 import emailDetails from "./emailDetails";
 import errors from "./errors";
