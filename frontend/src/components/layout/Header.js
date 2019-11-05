@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Link } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import { logout } from "../../actions/auth";
@@ -10,6 +10,10 @@ export class Header extends Component {
     logout: PropTypes.func.isRequired
   };
 
+  emailConnect() {
+    window.location.href = "emailConnect";
+  }
+
   render() {
     const { isAuthenticated, user } = this.props.auth;
 
@@ -18,6 +22,14 @@ export class Header extends Component {
         <span className="navbar-text mr-3">
           <strong>{user ? `Welcome ${user.username}` : ""}</strong>
         </span>
+
+        <button
+          onClick={this.emailConnect}
+          className="nav-link btn btn-success btn-sm text-light"
+        >
+          Connected Accounts
+        </button>
+
         <li className="nav-item">
           <button
             onClick={this.props.logout}
@@ -59,7 +71,7 @@ export class Header extends Component {
             <span className="navbar-toggler-icon" />
           </button>
           <div className="collapse navbar-collapse" id="navbarTogglerDemo01">
-            <a className="navbar-brand" href="#">
+            <a className="navbar-brand" href="/">
               Smart Email Service
             </a>
           </div>

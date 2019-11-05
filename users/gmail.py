@@ -16,7 +16,7 @@ def connect_new_account(app_token):
         'credentials.json', SCOPES)
     creds = flow.run_local_server(port=0)
 
-    # get what you need from the profile
+    # get what you need from the profile through GMail API
     service = build('gmail', 'v1', credentials=creds)
     profile = service.users().getProfile(userId='me').execute()
     address = profile.get('emailAddress')
@@ -40,7 +40,6 @@ def get_single_email(address, email_id, app_token):
             results = service.users().messages().get(
                 userId='me', id=email_id, format='raw').execute()
 
-            # body = get_body(results.get('payload'))
             msg_str = base64.urlsafe_b64decode(results['raw'].encode('ASCII'))
             mime_msg = email.message_from_bytes(msg_str)
             messageMainType = mime_msg.get_content_maintype()
@@ -145,6 +144,7 @@ def get_email_details_from_account(connectionAndN):
                     'id': myId,
                     'date': date,
                     'unread': 'UNREAD' in labels,
+                    'labels': labels,
                     'sender': sender,
                     'snippet': snippet,
                     'subject': subject
