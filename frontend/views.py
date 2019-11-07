@@ -11,3 +11,11 @@ def home(request):
 
 def base(request):
     return render(request, "frontend/registration/base.html")
+
+
+def emailConnect(request):
+    return render(request, "frontend/emailConnect.html")
+
+
+def emailView(request):
+    return render(request, "frontend/emailView.html")

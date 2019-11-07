@@ -1,32 +1,32 @@
 // reducer: evaluate action and send down certain state depending on action
 import {
-  GET_CATALGPAIRS,
-  DELETE_CATALGPAIR,
-  ADD_CATALGPAIR
+  GET_EMAILTOKEN,
+  DELETE_EMAILTOKEN,
+  ADD_EMAILTOKEN
 } from "../actions/types.js";
 
 const initialState = {
-  catAlgPairs: []
+  emailToken: []
 };
 
 export default function(state = initialState, action) {
   switch (action.type) {
-    case GET_CATALGPAIRS:
+    case GET_EMAILTOKEN:
       return {
         ...state,
-        catAlgPairs: action.payload
+        emailToken: action.payload
       };
-    case DELETE_CATALGPAIR:
+    case DELETE_EMAILTOKEN:
       return {
         ...state,
-        catAlgPairs: state.catAlgPairs.filter(
-          catAlgPair => catAlgPair.id !== action.payload
+        emailToken: state.emailToken.filter(
+          emailToken => emailToken.id !== action.payload
         )
       };
-    case ADD_CATALGPAIR:
+    case ADD_EMAILTOKEN:
       return {
         ...state,
-        catAlgPairs: [...state.catAlgPairs, action.payload]
+        emailToken: [...state.emailToken, action.payload]
       };
     default:
       return state;

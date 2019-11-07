@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
     atomic = False
     dependencies = [
-        ('users', '0003_auto_20190918_0526'),
+        ('src', '0003_auto_20190918_0526'),
     ]
 
     operations = [

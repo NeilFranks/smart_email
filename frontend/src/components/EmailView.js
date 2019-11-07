@@ -11,7 +11,7 @@ import { Provider as AlertProvider } from "react-alert";
 import AlertTemplate from "react-alert-template-basic";
 
 import Header from "./layout/Header";
-import Dashboard from "./users/Dashboard";
+import ViewEmailDashboard from "./src/ViewEmailDashboard";
 import Alerts from "./layout/Alerts";
 import Login from "./accounts/Login";
 import Register from "./accounts/Register";
@@ -27,7 +27,7 @@ const alertOptions = {
   position: "bottom center"
 };
 
-class App extends Component {
+class EmailView extends Component {
   componentDidMount() {
     store.dispatch(loadUser());
   }
@@ -42,7 +42,7 @@ class App extends Component {
               <Alerts />
               <div className="container">
                 <Switch>
-                  <PrivateRoute exact path="/" component={Dashboard} />
+                  <PrivateRoute exact path="/" component={ViewEmailDashboard} />
                   <Route exact path="/register" component={Register} />
                   <Route exact path="/login" component={Login} />
                 </Switch>
@@ -55,4 +55,4 @@ class App extends Component {
   }
 }
 
-ReactDOM.render(<App />, document.getElementById("app"));
+ReactDOM.render(<EmailView />, document.getElementById("emailView"));

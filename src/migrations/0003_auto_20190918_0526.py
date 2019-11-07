@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
     atomic = False
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('users', '0002_auto_20190913_0736'),
+        ('src', '0002_auto_20190913_0736'),
     ]
 
     operations = [
@@ -20,6 +20,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='categoryalgorithmpair',
             name='owner',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='catAlgPairs', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE,
+                                    related_name='emailPass', to=settings.AUTH_USER_MODEL),
         ),
     ]
