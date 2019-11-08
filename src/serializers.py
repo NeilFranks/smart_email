@@ -22,3 +22,9 @@ class EmailDetailsSerializer(serializers.Serializer):
 
 class ConnectedAddressesSerializer(serializers.Serializer):
     addresses = serializers.ListField()
+    
+class McwFromLabelSerializer(serializers.Serializer):
+    mcw = serializers.ListField()
+
+class EmailsFromLabelSerializer(serializers.Serializer):
+    detailsList = serializers.ListField()

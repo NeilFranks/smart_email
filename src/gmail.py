@@ -49,15 +49,32 @@ def get_single_email(address, email_id, app_token):
             msg_str = base64.urlsafe_b64decode(results['raw'].encode('ASCII'))
             mime_msg = email.message_from_bytes(msg_str)
             messageMainType = mime_msg.get_content_maintype()
-            if messageMainType == 'multipart':
-                for part in mime_msg.get_payload():
-                    if part.get_content_maintype() == 'text':
-                        return part.get_payload()
-                return ""
-            elif messageMainType == 'text':
+            if 'multipart' in messageMainType:
+                return get_email_body(mime_msg, messageMainType)
+            elif messageMainType == 'text/plain':
                 return mime_msg.get_payload()
     return None
 
+def get_email_body(msg, message_type):
+    if 'multipart' in message_type:
+        for part in msg.get_payload():
+            m_type = part["Content-Type"].split()[0].replace(";", "")
+            if 'multipart' in m_type:
+                output = get_email_body(part, m_type)
+            elif 'text' in m_type:
+                encoding = part["Content-Type"].split()[1].split("=")[1].lower()
+                try:
+                    output = base64.urlsafe_b64decode(part.get_payload()).decode(encoding)
+                except:
+                    output = part.get_payload()
+                break
+    elif 'text' in m_type:
+        encoding = part["Content-Type"].split()[1].split("=")[1].lower()
+        try:
+            output = base64.urlsafe_b64decode(part.get_payload()).decode(encoding)
+        except:
+            output = part.get_payload()
+    return output
 
 def get_email_details(n, app_token):
     '''
@@ -87,6 +104,29 @@ def get_email_details(n, app_token):
 
     return detailsList
 
+def get_email_details_from_label(label, app_token):
+    '''
+    Returns id, date (and time), from, and subject of the most recent n emails sent to the address.
+    '''
+
+    connections = retrieve_accounts(app_token)
+    detailsList = []
+
+    # Step 1: Init multiprocessing.Pool()
+    pool = mp.Pool(mp.cpu_count())
+
+    # Step 2: `pool.map` the `get_email_details_from_account()`
+    detailsList = pool.map(get_emails_from_label, [(
+        connection, label) for connection in connections])  # Returns a list of lists
+
+    # Flatten the list of lists
+    detailsList = [ent for sublist in detailsList for ent in sublist]
+
+    # Step 3: Don't forget to close
+    pool.close()
+
+    return detailsList
+
 
 def get_connected_addresses(app_token):
     '''
@@ -102,6 +142,53 @@ def get_connected_addresses(app_token):
 
     return addressList
 
+def get_emails_from_label(connectionAndLabel):
+    detailsList = []
+
+    connection = connectionAndLabel[0]
+    label = connectionAndLabel[1]
+
+    # get access to emails
+    creds = connection.get("creds")
+    service = build('gmail', 'v1', credentials=creds)
+    response = service.users().labels().list(userId='me').execute()
+    labels = response['labels']
+
+    label_id = list()
+    for i in labels:
+        if i["name"] == label:
+            label_id.append(i["id"].lstrip())
+            break
+
+    results = service.users().messages().list(userId='me', labelIds=label_id).execute()
+    msgs = results.get('messages', [])
+
+    if not msgs:
+        print("No messages")
+    else:
+        for msg in msgs:
+
+            message = service.users().messages().get(
+                userId='me', id=msg["id"], format='raw').execute()
+
+            msg_str = base64.urlsafe_b64decode(message['raw'].encode('ASCII'))
+            mime_msg = email.message_from_bytes(msg_str)
+            messageMainType = mime_msg.get_content_maintype()
+            if 'multipart' in messageMainType:
+                body = get_email_body(mime_msg, messageMainType)
+            elif messageMainType == 'text/plain':
+                body = mime_msg.get_payload()
+            print(body)
+            # isolate the details
+            myId = message.get('id')
+            detailsList.append(
+                {
+                    'address': connection.get("address"),
+                    'id': myId,
+                    'body': body
+                })
+
+    return detailsList
 
 def get_email_details_from_account(connectionAndN):
 
@@ -128,6 +215,7 @@ def get_email_details_from_account(connectionAndN):
             myId = message.get('id')
             labels = message.get('labelIds')
             payload = message.get('payload')
+            #print(payload)
             headers = payload.get('headers')
 
             for header in headers:
@@ -160,7 +248,7 @@ def get_email_details_from_account(connectionAndN):
 
 
 if __name__ == '__main__':
-    tok = "452b8c9c861bb56d20df5d54b71931db8b04dbe9108441c1b35a10adb2e13d06"
-    bil = get_email_details("neilcapstonetest@gmail.com", 2, tok)
-    hum = get_single_email("neilcapstonetest@gmail.com",
-                           '16e1ffd1248982ac', tok)
+    tok = "d4d7aca543e0c5b96e795f71956c8323e05cad6c05791b069a9fb9444a530808"
+    bil = get_email_details(2, tok)
+    #hum = get_single_email("capstonespamtest@gmail.com",
+                           #'16e1ffd1248982ac', tok)
