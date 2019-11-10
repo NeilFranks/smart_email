@@ -16,7 +16,7 @@ export class EmailList extends Component {
   render() {
     return (
       <Fragment>
-        <table className="table">
+        <table className="email list">
           <tbody>
             {this.props.emailDetails.map(emailDetails =>
               emailDetails.unread ? (
