@@ -17,7 +17,7 @@ export class Categories extends Component {
       <div>
         (
         <Fragment>
-          <table className="category list">
+          <table className="table">
             <thead>
               <tr>
                 <th>Categories</th>
