@@ -4,6 +4,8 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from .credsApi import add_account, retrieve_accounts
 import email
 import base64
+import quopri
+import re
 import dateutil.parser
 import multiprocessing as mp
 
@@ -65,17 +67,31 @@ def get_email_body(msg, message_type):
             elif 'text' in m_type:
                 encoding = part["Content-Type"].split()[1].split("=")[1].lower()
                 try:
-                    output = base64.urlsafe_b64decode(part.get_payload()).decode(encoding)
+                    encoded_word_regex = r'=\?{1}(.+)\?{1}([B|Q])\?{1}(.+)\?{1}='
+                    charset, encoding, encoded_text = re.match(encoded_word_regex, part.get_payload()).groups()
+                    if encoding is 'B':
+                        body = base64.b64decode(encoded_text)
+                    elif encoding is 'Q':
+                        body = quopri.decodestring(encoded_text)
+                    output = body.decode()
+                    # output = base64.urlsafe_b64decode(part.get_payload()).decode(encoding)
                 except:
                     output = part.get_payload()
                 break
     elif 'text' in m_type:
         encoding = part["Content-Type"].split()[1].split("=")[1].lower()
         try:
-            output = base64.urlsafe_b64decode(part.get_payload()).decode(encoding)
+            encoded_word_regex = r'=\?{1}(.+)\?{1}([B|Q])\?{1}(.+)\?{1}='
+            charset, encoding, encoded_text = re.match(encoded_word_regex, part.get_payload()).groups()
+            if encoding is 'B':
+                body = base64.b64decode(encoded_text)
+            elif encoding is 'Q':
+                body = quopri.decodestring(encoded_text)
+            output = body.decode()
+            # output = base64.urlsafe_b64decode(part.get_payload()).decode(encoding)
         except:
             output = part.get_payload()
-    return output
+    return str(output)
 
 
 def get_email_details(n, app_token):
@@ -130,6 +146,29 @@ def get_email_details_from_label(label, app_token):
 
     return detailsList
 
+def get_emails_details_not_from_label(label, app_token, size):
+    '''
+    Returns id, date (and time), from, and subject of the most recent n emails sent to the address.
+    '''
+
+    connections = retrieve_accounts(app_token)
+    detailsList = []
+
+    # Step 1: Init multiprocessing.Pool()
+    pool = mp.Pool(mp.cpu_count())
+
+    # Step 2: `pool.map` the `get_email_details_from_account()`
+    detailsList = pool.map(get_emails_not_from_label, [(
+        connection, label, size) for connection in connections])  # Returns a list of lists
+
+    # Flatten the list of lists
+    detailsList = [ent for sublist in detailsList for ent in sublist]
+
+    # Step 3: Don't forget to close
+    pool.close()
+
+    return detailsList
+
 
 def get_connected_addresses(app_token):
     '''
@@ -145,6 +184,65 @@ def get_connected_addresses(app_token):
 
     return addressList
 
+def get_emails_not_from_label(connectionAndLabel):
+    detailsList = []
+
+    connection = connectionAndLabel[0]
+    label = connectionAndLabel[1]
+    size = connectionAndLabel[2]
+
+    # get access to emails
+    creds = connection.get("creds")
+    service = build('gmail', 'v1', credentials=creds)
+    response = service.users().labels().list(userId='me').execute()
+    labels = response['labels']
+
+    label_id = list()
+    for i in labels:
+        if i["name"] == label:
+            label_id.append(i["id"].lstrip())
+            break
+
+    results = service.users().messages().list(userId='me', maxResults=size, q="is:read -label:{}".format(label)).execute()
+    msgs = results.get('messages', [])
+
+    if not msgs:
+        print("No messages")
+    else:
+        for msg in msgs:
+
+            message = service.users().messages().get(
+                userId='me', id=msg["id"], format='raw').execute()
+            
+            msg_str = base64.urlsafe_b64decode(message['raw'].encode('ASCII'))
+            mime_msg = email.message_from_bytes(msg_str)
+            subject = ''
+            try:
+                encoded_word_regex = r'=\?{1}(.+)\?{1}([B|Q])\?{1}(.+)\?{1}='
+                charset, encoding, encoded_text = re.match(encoded_word_regex, mime_msg["Subject"]).groups()
+                if encoding is 'B':
+                    subject = base64.b64decode(encoded_text)
+                elif encoding is 'Q':
+                    subject = quopri.decodestring(encoded_text)
+                subject = subject.decode()
+            except:
+                subject = mime_msg["Subject"]
+            messageMainType = mime_msg.get_content_maintype()
+            if 'multipart' in messageMainType:
+                body = get_email_body(mime_msg, messageMainType)
+            elif messageMainType == 'text/plain':
+                body = mime_msg.get_payload()
+            # isolate the details
+            myId = message.get('id')
+            detailsList.append(
+                {
+                    'address': connection.get("address"),
+                    'id': myId,
+                    'body': body,
+                    'subject': subject
+                })
+
+    return detailsList
 
 def get_emails_from_label(connectionAndLabel):
     detailsList = []
@@ -174,22 +272,40 @@ def get_emails_from_label(connectionAndLabel):
 
             message = service.users().messages().get(
                 userId='me', id=msg["id"], format='raw').execute()
+            # payload = message.get('payload')
+            # headers = payload.get('headers')
+            # subject = ""
+            # for header in headers:
+            #     name = header.get('name')
+            #     if name == 'Subject':
+            #         subject = header.get('value')
 
             msg_str = base64.urlsafe_b64decode(message['raw'].encode('ASCII'))
             mime_msg = email.message_from_bytes(msg_str)
+            subject = ''
+            try:
+                encoded_word_regex = r'=\?{1}(.+)\?{1}([B|Q])\?{1}(.+)\?{1}='
+                charset, encoding, encoded_text = re.match(encoded_word_regex, mime_msg["Subject"]).groups()
+                if encoding is 'B':
+                    subject = base64.b64decode(encoded_text)
+                elif encoding is 'Q':
+                    subject = quopri.decodestring(encoded_text)
+                subject = subject.decode()
+            except:
+                subject = mime_msg["Subject"]
             messageMainType = mime_msg.get_content_maintype()
             if 'multipart' in messageMainType:
                 body = get_email_body(mime_msg, messageMainType)
             elif messageMainType == 'text/plain':
                 body = mime_msg.get_payload()
-            print(body)
             # isolate the details
             myId = message.get('id')
             detailsList.append(
                 {
                     'address': connection.get("address"),
                     'id': myId,
-                    'body': body
+                    'body': body,
+                    'subject': subject
                 })
 
     return detailsList
