@@ -1,6 +1,6 @@
 import React, { Fragment } from "react";
-import EmailList from "./EmailList";
-import Categories from "./Categories";
+import PickEmailList from "./PickEmailList";
+import TrainList from "./TrainList";
 
 export default function ViewEmailDashboard() {
   return (
@@ -13,11 +13,11 @@ export default function ViewEmailDashboard() {
                 whiteSpace: "nowrap",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
-                width: "20%",
+                width: "50%",
                 maxWidth: "0"
               }}
             >
-              <Categories />
+              <PickEmailList />
             </td>
 
             <td
@@ -25,11 +25,11 @@ export default function ViewEmailDashboard() {
                 whiteSpace: "nowrap",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
-                width: "80%",
+                width: "50%",
                 maxWidth: "0"
               }}
             >
-              <EmailList />
+              <TrainList />
             </td>
           </tr>
         </tbody>

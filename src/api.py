@@ -1,8 +1,23 @@
 from .gmail import connect_new_account, get_single_email, get_email_details, get_connected_addresses, get_emails_from_label, get_email_details_from_label
 from rest_framework.response import Response
 from rest_framework import viewsets, permissions
-from .serializers import ConnectNewEmailSerializer, ConnectNewAccountSerializer, SingleEmailSerializer, EmailDetailsSerializer, ConnectedAddressesSerializer, EmailsFromLabelSerializer, McwFromLabelSerializer
+from .serializers import CategorySerializer, ConnectNewEmailSerializer, ConnectNewAccountSerializer, SingleEmailSerializer, EmailDetailsSerializer, ConnectedAddressesSerializer, EmailsFromLabelSerializer, McwFromLabelSerializer
 from .learn import mcw_from_label
+
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    permissions_classes = [
+        permissions.IsAuthenticated,
+    ]
+
+    serializer_class = CategorySerializer
+
+    def get_queryset(self):
+        return self.request.user.category.all()
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
 
 class ConnectedEmailViewSet(viewsets.ModelViewSet):
     permissions_classes = [
@@ -83,6 +98,7 @@ class EmailDetailsViewSet(viewsets.GenericViewSet):
         results = EmailDetailsSerializer(detailsList).data
         return Response(results)
 
+
 class EmailFromLabelViewSet(viewsets.GenericViewSet):
     permissions_classes = [
         permissions.IsAuthenticated,
@@ -104,9 +120,11 @@ class EmailFromLabelViewSet(viewsets.GenericViewSet):
             # auth is like this when request comes from postman
             token = request.META.get('HTTP_AUTHORIZATION')
 
-        detailsList = {"detailsList": get_email_details_from_label(label, token)}
+        detailsList = {
+            "detailsList": get_email_details_from_label(label, token)}
         results = EmailDetailsSerializer(detailsList).data
         return Response(results)
+
 
 class McwFromLabelViewSet(viewsets.GenericViewSet):
     permissions_classes = [

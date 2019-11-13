@@ -55,6 +55,7 @@ def get_single_email(address, email_id, app_token):
                 return mime_msg.get_payload()
     return None
 
+
 def get_email_body(msg, message_type):
     if 'multipart' in message_type:
         for part in msg.get_payload():
@@ -75,6 +76,7 @@ def get_email_body(msg, message_type):
         except:
             output = part.get_payload()
     return output
+
 
 def get_email_details(n, app_token):
     '''
@@ -103,6 +105,7 @@ def get_email_details(n, app_token):
         detailsList = detailsList[0:int(n)]
 
     return detailsList
+
 
 def get_email_details_from_label(label, app_token):
     '''
@@ -141,6 +144,7 @@ def get_connected_addresses(app_token):
             addressList.append(address)
 
     return addressList
+
 
 def get_emails_from_label(connectionAndLabel):
     detailsList = []
@@ -189,6 +193,7 @@ def get_emails_from_label(connectionAndLabel):
                 })
 
     return detailsList
+
 
 def get_email_details_from_account(connectionAndN):
 

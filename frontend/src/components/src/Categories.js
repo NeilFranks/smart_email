@@ -1,8 +1,15 @@
-import React, { Component } from "react";
+import React, { Component, Fragment } from "react";
+import { connect } from "react-redux";
+import PropTypes from "prop-types";
+import {
+  addCategory,
+  getCategory,
+  deleteCategory
+} from "../../actions/categories";
 
 export class Categories extends Component {
   static propTypes = {
-    category: PropTypes.array.isRequired,
+    categories: PropTypes.array.isRequired,
     addCategory: PropTypes.func.isRequired,
     getCategory: PropTypes.func.isRequired,
     deleteCategory: PropTypes.func.isRequired
@@ -15,7 +22,6 @@ export class Categories extends Component {
   render() {
     return (
       <div>
-        (
         <Fragment>
           <table className="table">
             <thead>
@@ -26,9 +32,9 @@ export class Categories extends Component {
               </tr>
             </thead>
             <tbody>
-              {this.props.category.map(category => (
+              {this.props.categories.map(category => (
                 <tr key={category.id}>
-                  <td>{category.address}</td>
+                  <td>{category.name}</td>
                   <td>
                     <button
                       onClick={this.props.deleteCategory.bind(
@@ -46,31 +52,47 @@ export class Categories extends Component {
             </tbody>
             <tfoot>
               <tr>
-                <td />
-                <td>
+                <td
+                  style={{
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    width: "80%",
+                    maxWidth: "0"
+                  }}
+                >
+                  <i>New Category</i>
+                </td>
+                <td
+                  align="right"
+                  style={{
+                    whiteSpace: "nowrap",
+                    width: "20%",
+                    maxWidth: "0"
+                  }}
+                >
                   <button
                     onClick={this.props.addCategory.bind(this)}
                     className="btn btn-primary btn-sm"
                   >
                     {" "}
-                    Add new account
+                    +
                   </button>
                 </td>
               </tr>
             </tfoot>
           </table>
         </Fragment>
-        )
       </div>
     );
   }
 }
 
 const mapStateToProps = state => ({
-  category: state.category.category // get reducer, then get its actual et
+  categories: state.categories.categories // get reducer, then get its actual et
 });
 
 export default connect(
   mapStateToProps,
   { getCategory, deleteCategory, addCategory }
-)(Category);
+)(Categories);
