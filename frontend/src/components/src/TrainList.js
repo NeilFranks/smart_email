@@ -24,28 +24,34 @@ export class TrainList extends Component {
                   }}
                 >
                   <table className="table">
-                    <tr
-                      style={{
-                        fontSize: "small"
-                      }}
-                    >
-                      <strong>{trainEmails.sender}</strong>
-                    </tr>
-                    <tr
-                      style={{
-                        fontSize: "small"
-                      }}
-                    >
-                      <strong>{trainEmails.subject}</strong>
-                      {snippetPrepend(trainEmails.snippet)}
-                    </tr>
-                    <tr
-                      style={{
-                        fontSize: "small"
-                      }}
-                    >
-                      {dateString(new Date(trainEmails.date))}
-                    </tr>
+                    <tbody>
+                      <tr
+                        style={{
+                          fontSize: "small"
+                        }}
+                      >
+                        <td>
+                          <strong>{trainEmails.sender}</strong>
+                        </td>
+                      </tr>
+                      <tr
+                        style={{
+                          fontSize: "small"
+                        }}
+                      >
+                        <td>
+                          <strong>{trainEmails.subject}</strong>
+                          {snippetPrepend(trainEmails.snippet)}
+                        </td>
+                      </tr>
+                      <tr
+                        style={{
+                          fontSize: "small"
+                        }}
+                      >
+                        <td>{dateString(new Date(trainEmails.date))}</td>
+                      </tr>
+                    </tbody>
                   </table>
                 </td>
                 <td>

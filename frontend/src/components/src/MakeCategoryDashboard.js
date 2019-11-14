@@ -1,10 +1,12 @@
 import React, { Fragment } from "react";
+import TrainHeader from "./TrainHeader";
 import PickEmailList from "./PickEmailList";
 import TrainList from "./TrainList";
 
 export default function ViewEmailDashboard() {
   return (
     <Fragment>
+      <TrainHeader />
       <table className="table">
         <tbody>
           <tr>

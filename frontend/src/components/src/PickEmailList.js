@@ -31,28 +31,34 @@ export class PickEmailList extends Component {
                     }}
                   >
                     <table className="table">
-                      <tr
-                        style={{
-                          fontSize: "small"
-                        }}
-                      >
-                        <strong>{emailDetails.sender}</strong>
-                      </tr>
-                      <tr
-                        style={{
-                          fontSize: "small"
-                        }}
-                      >
-                        <strong>{emailDetails.subject}</strong>
-                        {snippetPrepend(emailDetails.snippet)}
-                      </tr>
-                      <tr
-                        style={{
-                          fontSize: "small"
-                        }}
-                      >
-                        {dateString(new Date(emailDetails.date))}
-                      </tr>
+                      <tbody>
+                        <tr
+                          style={{
+                            fontSize: "small"
+                          }}
+                        >
+                          <td>
+                            <strong>{emailDetails.sender}</strong>
+                          </td>
+                        </tr>
+                        <tr
+                          style={{
+                            fontSize: "small"
+                          }}
+                        >
+                          <td>
+                            <strong>{emailDetails.subject}</strong>
+                            {snippetPrepend(emailDetails.snippet)}
+                          </td>
+                        </tr>
+                        <tr
+                          style={{
+                            fontSize: "small"
+                          }}
+                        >
+                          <td>{dateString(new Date(emailDetails.date))}</td>
+                        </tr>
+                      </tbody>
                     </table>
                   </td>
                   <td
