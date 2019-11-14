@@ -24,6 +24,18 @@ export default function(state = initialState, action) {
         )
       };
     case ADD_TRAINEMAILS:
+      var i;
+      for (i = 0; i < state.trainEmails.length; i++) {
+        if (state.trainEmails[i].id === action.payload.id) {
+          // return existing state if email is already in list
+          return {
+            ...state,
+            trainEmails: [...state.trainEmails]
+          };
+        }
+      }
+
+      // add email if it wasn't already in list
       return {
         ...state,
         trainEmails: [...state.trainEmails, action.payload]
