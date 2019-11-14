@@ -1,11 +1,15 @@
-import axios from "axios";
 import { GET_TRAINEMAILS, REMOVE_TRAINEMAILS, ADD_TRAINEMAILS } from "./types";
 
-export const addTrainEmails = email => (dispatch, getState) => {
-  console.log(email.id);
-  axios.dispatch({
+export const addTrainEmails = email => dispatch => {
+  dispatch({
     type: ADD_TRAINEMAILS,
-    payload: email
+    payload: {
+      id: email.emailDetails.id,
+      sender: email.emailDetails.sender,
+      subject: email.emailDetails.subject,
+      snippet: email.emailDetails.snippet,
+      date: email.emailDetails.date
+    }
   });
 };
 

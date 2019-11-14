@@ -1,9 +1,8 @@
 import axios from "axios";
-import { createMessage, returnErrors } from "./messages";
+import { returnErrors } from "./messages";
 import { tokenConfig } from "./auth";
 
 import { GET_EMAILDETAILS, GET_CONNECTEDACCOUNTS } from "./types";
-import emailDetails from "../reducers/emailDetails";
 
 export const getEmailDetails = addressList => (dispatch, getState) => {
   axios

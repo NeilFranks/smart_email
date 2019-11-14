@@ -7,7 +7,8 @@ import { addTrainEmails } from "../../actions/trainEmails";
 export class PickEmailList extends Component {
   static propTypes = {
     emailDetails: PropTypes.array.isRequired,
-    getEmailDetails: PropTypes.func.isRequired
+    getEmailDetails: PropTypes.func.isRequired,
+    addTrainEmails: PropTypes.func.isRequired
   };
 
   componentDidMount() {
@@ -58,7 +59,7 @@ export class PickEmailList extends Component {
                 </td>
                 <td>
                   <button
-                    onClick={addTrainEmails(emailDetails)}
+                    onClick={() => this.props.addTrainEmails({ emailDetails })}
                     className="btn btn-info"
                   >
                     +
@@ -95,7 +96,6 @@ const snippetPrepend = snippet => {
   return " - ".concat(snippet);
 };
 
-export default connect(
-  mapStateToProps,
-  { getEmailDetails }
-)(PickEmailList);
+export default connect(mapStateToProps, { getEmailDetails, addTrainEmails })(
+  PickEmailList
+);
