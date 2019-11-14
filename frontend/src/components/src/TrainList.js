@@ -54,7 +54,7 @@ export class TrainList extends Component {
                 </td>
                 <td>
                   <button
-                    onClick={() => this.props.removeTrainEmails(trainEmails.id)}
+                    onClick={() => this.props.removeTrainEmails(trainEmails)}
                     className="btn btn-danger"
                   >
                     -

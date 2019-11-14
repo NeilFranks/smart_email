@@ -5,6 +5,7 @@ import emailDetails from "./emailDetails";
 import errors from "./errors";
 import messages from "./messages";
 import trainEmails from "./trainEmails";
+import trainIds from "./trainIds";
 import auth from "./auth";
 
 export default combineReducers({
@@ -14,5 +15,6 @@ export default combineReducers({
   errors,
   messages,
   trainEmails,
+  trainIds,
   auth
 });

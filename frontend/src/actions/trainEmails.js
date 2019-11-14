@@ -1,4 +1,11 @@
-import { GET_TRAINEMAILS, REMOVE_TRAINEMAILS, ADD_TRAINEMAILS } from "./types";
+import {
+  GET_TRAINEMAILS,
+  REMOVE_TRAINEMAILS,
+  ADD_TRAINEMAILS,
+  ADD_TRAINIDS,
+  REMOVE_TRAINIDS,
+  GET_TRAINIDS
+} from "./types";
 
 export const addTrainEmails = email => dispatch => {
   dispatch({
@@ -11,6 +18,11 @@ export const addTrainEmails = email => dispatch => {
       date: email.emailDetails.date
     }
   });
+
+  dispatch({
+    type: ADD_TRAINIDS,
+    payload: { id: email.emailDetails.id }
+  });
 };
 
 export const getTrainEmails = () => (dispatch, getState) => {
@@ -20,9 +32,21 @@ export const getTrainEmails = () => (dispatch, getState) => {
   });
 };
 
-export const removeTrainEmails = id => dispatch => {
+export const removeTrainEmails = email => dispatch => {
   dispatch({
     type: REMOVE_TRAINEMAILS,
-    payload: id
+    payload: email.id
+  });
+
+  dispatch({
+    type: REMOVE_TRAINIDS,
+    payload: email.id
+  });
+};
+
+export const getTrainIds = () => (dispatch, getState) => {
+  dispatch({
+    type: GET_TRAINIDS,
+    payload: getState
   });
 };
