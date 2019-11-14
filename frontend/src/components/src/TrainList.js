@@ -1,17 +1,14 @@
 import React, { Component, Fragment } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
-import { getTrainEmails } from "../../actions/trainEmails";
+import { getTrainEmails, removeTrainEmails } from "../../actions/trainEmails";
 
 export class TrainList extends Component {
   static propTypes = {
     trainEmails: PropTypes.array.isRequired,
-    getTrainEmails: PropTypes.func.isRequired
+    getTrainEmails: PropTypes.func.isRequired,
+    removeTrainEmails: PropTypes.func.isRequired
   };
-
-  //   componentDidMount() {
-  //     this.props.getTrainEmails();
-  //   }
 
   render() {
     return (
@@ -55,6 +52,14 @@ export class TrainList extends Component {
                 >
                   {dateString(new Date(trainEmails.date))}
                 </td>
+                <td>
+                  <button
+                    onClick={() => this.props.removeTrainEmails(trainEmails.id)}
+                    className="btn btn-danger"
+                  >
+                    -
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -86,7 +91,6 @@ const snippetPrepend = snippet => {
   return " - ".concat(snippet);
 };
 
-export default connect(
-  mapStateToProps,
-  { getTrainEmails }
-)(TrainList);
+export default connect(mapStateToProps, { getTrainEmails, removeTrainEmails })(
+  TrainList
+);
