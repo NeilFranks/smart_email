@@ -10,9 +10,6 @@ export default function ViewEmailDashboard() {
           <tr>
             <td
               style={{
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
                 width: "50%",
                 maxWidth: "0"
               }}
@@ -22,9 +19,6 @@ export default function ViewEmailDashboard() {
 
             <td
               style={{
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
                 width: "50%",
                 maxWidth: "0"
               }}

@@ -19,38 +19,34 @@ export class TrainList extends Component {
               <tr key={trainEmails.id} bgcolor="#fff">
                 <td
                   style={{
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    width: "20%",
-                    maxWidth: "0"
+                    width: "90%",
+                    maxWidth: 0
                   }}
                 >
-                  <strong>{trainEmails.sender}</strong>
-                </td>
-                <td
-                  style={{
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    width: "65%",
-                    maxWidth: "0"
-                  }}
-                >
-                  <strong>{trainEmails.subject}</strong>
-                  {snippetPrepend(trainEmails.snippet)}
-                </td>
-                <td
-                  style={{
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    width: "15%",
-                    maxWidth: "0"
-                  }}
-                  align="right"
-                >
-                  {dateString(new Date(trainEmails.date))}
+                  <table className="table">
+                    <tr
+                      style={{
+                        fontSize: "small"
+                      }}
+                    >
+                      <strong>{trainEmails.sender}</strong>
+                    </tr>
+                    <tr
+                      style={{
+                        fontSize: "small"
+                      }}
+                    >
+                      <strong>{trainEmails.subject}</strong>
+                      {snippetPrepend(trainEmails.snippet)}
+                    </tr>
+                    <tr
+                      style={{
+                        fontSize: "small"
+                      }}
+                    >
+                      {dateString(new Date(trainEmails.date))}
+                    </tr>
+                  </table>
                 </td>
                 <td>
                   <button

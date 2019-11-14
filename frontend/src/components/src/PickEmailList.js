@@ -26,40 +26,42 @@ export class PickEmailList extends Component {
                 <tr key={emailDetails.id} bgcolor="#fff">
                   <td
                     style={{
-                      whiteSpace: "nowrap",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      width: "20%",
-                      maxWidth: "0"
+                      width: "90%",
+                      maxWidth: 0
                     }}
                   >
-                    <strong>{emailDetails.sender}</strong>
+                    <table className="table">
+                      <tr
+                        style={{
+                          fontSize: "small"
+                        }}
+                      >
+                        <strong>{emailDetails.sender}</strong>
+                      </tr>
+                      <tr
+                        style={{
+                          fontSize: "small"
+                        }}
+                      >
+                        <strong>{emailDetails.subject}</strong>
+                        {snippetPrepend(emailDetails.snippet)}
+                      </tr>
+                      <tr
+                        style={{
+                          fontSize: "small"
+                        }}
+                      >
+                        {dateString(new Date(emailDetails.date))}
+                      </tr>
+                    </table>
                   </td>
                   <td
                     style={{
-                      whiteSpace: "nowrap",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      width: "65%",
-                      maxWidth: "0"
+                      width: "10%",
+                      maxWidth: 0
                     }}
+                    align="center"
                   >
-                    <strong>{emailDetails.subject}</strong>
-                    {snippetPrepend(emailDetails.snippet)}
-                  </td>
-                  <td
-                    style={{
-                      whiteSpace: "nowrap",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      width: "15%",
-                      maxWidth: "0"
-                    }}
-                    align="right"
-                  >
-                    {dateString(new Date(emailDetails.date))}
-                  </td>
-                  <td>
                     <button
                       onClick={() =>
                         this.props.addTrainEmails({ emailDetails })
