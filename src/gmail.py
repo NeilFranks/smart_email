@@ -147,6 +147,7 @@ def get_email_details_from_label(label, app_token):
 
     return detailsList
 
+
 def get_emails_details_not_from_label(label, app_token, size):
     '''
     Returns id, date (and time), from, and subject of the most recent n emails sent to the address.
@@ -184,6 +185,7 @@ def get_connected_addresses(app_token):
             addressList.append(address)
 
     return addressList
+
 
 def get_emails_not_from_label(connectionAndLabel):
     detailsList = []
@@ -244,6 +246,7 @@ def get_emails_not_from_label(connectionAndLabel):
                 })
 
     return detailsList
+
 
 def get_emails_from_label(connectionAndLabel):
     detailsList = []
