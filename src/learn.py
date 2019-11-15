@@ -43,7 +43,7 @@ def remove_common_words(dict):
 def mcw_from_label(label, app_token):
     email_list = get_email_details_from_label(label, app_token)
     second_list = get_emails_details_not_from_label(label, app_token, len(email_list))
-    full_list = email_list + second_list
+    full_list = second_list + email_list
     word_list = []
     for email in full_list:
         email_body = email["body"]
@@ -65,7 +65,10 @@ def mcw_from_label(label, app_token):
     SVC = LinearSVC()
     # Here's the model
     SVC.fit(train_matrix, train_labels)
-
+    mail = get_email_details_from_label("Not_Vice", app_token)
+    test_matrix = extract_features(mcw, mail)
+    prediction = SVC.predict(test_matrix)
+    print("I think this email is Vice!" if '1.' in str(prediction[0]) else "I think this email is Not Vice!")
     return mcw
 
 def extract_features(mcw, emails):
@@ -78,7 +81,7 @@ def extract_features(mcw, emails):
         for word in body_list:
             for i in range(len(mcw)):
                 if word == mcw[i][0]:
-                    print(word, mcw[i][0], i)
+                    # print(word, mcw[i][0], i)
                     features_matrix[emailID, i] += 1
                     break
         sub = email["body"]
@@ -88,6 +91,7 @@ def extract_features(mcw, emails):
             if word in mcw:
                 wordID = mcw.index(word)
                 features_matrix[emailID, wordID] += 1
+        # print(features_matrix[emailID])
         emailID = emailID + 1
     return features_matrix    
             
