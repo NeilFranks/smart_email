@@ -19,6 +19,11 @@ export class Categories extends Component {
     this.props.getCategory();
   }
 
+  navToMakeCategory() {
+    console.log("gagae");
+    window.location.href = "makeCategory";
+  }
+
   render() {
     return (
       <div>
@@ -72,10 +77,9 @@ export class Categories extends Component {
                   }}
                 >
                   <button
-                    onClick={this.props.addCategory.bind(this)}
+                    onClick={this.navToMakeCategory}
                     className="btn btn-primary btn-sm"
                   >
-                    {" "}
                     +
                   </button>
                 </td>
@@ -92,7 +96,8 @@ const mapStateToProps = state => ({
   categories: state.categories.categories // get reducer, then get its actual et
 });
 
-export default connect(
-  mapStateToProps,
-  { getCategory, deleteCategory, addCategory }
-)(Categories);
+export default connect(mapStateToProps, {
+  getCategory,
+  deleteCategory,
+  addCategory
+})(Categories);

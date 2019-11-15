@@ -13,7 +13,8 @@ export default function ViewEmailDashboard() {
             <td
               style={{
                 width: "50%",
-                maxWidth: "0"
+                maxWidth: "0",
+                overflow: "scroll"
               }}
             >
               <PickEmailList />
@@ -22,7 +23,8 @@ export default function ViewEmailDashboard() {
             <td
               style={{
                 width: "50%",
-                maxWidth: "0"
+                maxWidth: "0",
+                overflow: "scroll"
               }}
             >
               <TrainList />
