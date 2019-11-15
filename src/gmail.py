@@ -59,12 +59,13 @@ def get_single_email(address, email_id, app_token):
 
 
 def get_email_body(msg, message_type):
+    output = ''
     if 'multipart' in message_type:
         for part in msg.get_payload():
             m_type = part["Content-Type"].split()[0].replace(";", "")
             if 'multipart' in m_type:
                 output = get_email_body(part, m_type)
-            elif 'text' in m_type:
+            elif 'text' in m_type and 'html' not in m_type:
                 encoding = part["Content-Type"].split()[1].split("=")[1].lower()
                 try:
                     encoded_word_regex = r'=\?{1}(.+)\?{1}([B|Q])\?{1}(.+)\?{1}='
@@ -78,7 +79,7 @@ def get_email_body(msg, message_type):
                 except:
                     output = part.get_payload()
                 break
-    elif 'text' in m_type:
+    elif 'text' in m_type and 'html' not in m_type:
         encoding = part["Content-Type"].split()[1].split("=")[1].lower()
         try:
             encoded_word_regex = r'=\?{1}(.+)\?{1}([B|Q])\?{1}(.+)\?{1}='
@@ -91,7 +92,7 @@ def get_email_body(msg, message_type):
             # output = base64.urlsafe_b64decode(part.get_payload()).decode(encoding)
         except:
             output = part.get_payload()
-    return str(output)
+    return output
 
 
 def get_email_details(n, app_token):
