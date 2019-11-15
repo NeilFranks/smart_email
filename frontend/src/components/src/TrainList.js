@@ -19,6 +19,7 @@ export class TrainList extends Component {
               <tr key={trainEmails.id} bgcolor="#fff">
                 <td
                   style={{
+                    border: "none",
                     width: "90%",
                     maxWidth: 0
                   }}
@@ -39,7 +40,7 @@ export class TrainList extends Component {
                           fontSize: "small"
                         }}
                       >
-                        <td>
+                        <td style={{ wordBreak: "break-word" }}>
                           <strong>{trainEmails.subject}</strong>
                           {snippetPrepend(trainEmails.snippet)}
                         </td>
@@ -54,12 +55,19 @@ export class TrainList extends Component {
                     </tbody>
                   </table>
                 </td>
-                <td>
+                <td
+                  style={{
+                    border: "none",
+                    width: "10%",
+                    maxWidth: 0
+                  }}
+                  align="center"
+                >
                   <button
                     onClick={() => this.props.removeTrainEmails(trainEmails)}
                     className="btn btn-danger"
                   >
-                    -
+                    <strong>-</strong>
                   </button>
                 </td>
               </tr>

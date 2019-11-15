@@ -26,6 +26,7 @@ export class PickEmailList extends Component {
                 <tr key={emailDetails.id} bgcolor="#fff">
                   <td
                     style={{
+                      border: "none",
                       width: "90%",
                       maxWidth: 0
                     }}
@@ -46,7 +47,7 @@ export class PickEmailList extends Component {
                             fontSize: "small"
                           }}
                         >
-                          <td>
+                          <td style={{ wordBreak: "break-word" }}>
                             <strong>{emailDetails.subject}</strong>
                             {snippetPrepend(emailDetails.snippet)}
                           </td>
@@ -63,6 +64,7 @@ export class PickEmailList extends Component {
                   </td>
                   <td
                     style={{
+                      border: "none",
                       width: "10%",
                       maxWidth: 0
                     }}
@@ -74,7 +76,7 @@ export class PickEmailList extends Component {
                       }
                       className="btn btn-info"
                     >
-                      +
+                      <strong>+</strong>
                     </button>
                   </td>
                 </tr>
