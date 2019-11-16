@@ -68,5 +68,5 @@ def baseURL():
     except KeyError:
         baseURL = 'http://127.0.0.1:8000'
 
-    print("baseURL set to %s" % baseURL)
+    # print("baseURL set to %s" % baseURL)
     return baseURL

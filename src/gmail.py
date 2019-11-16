@@ -66,7 +66,6 @@ def get_email_body(msg, message_type):
             if 'multipart' in m_type:
                 output = get_email_body(part, m_type)
             elif 'text' in m_type and 'html' not in m_type:
-                encoding = part["Content-Type"].split()[1].split("=")[1].lower()
                 try:
                     encoded_word_regex = r'=\?{1}(.+)\?{1}([B|Q])\?{1}(.+)\?{1}='
                     charset, encoding, encoded_text = re.match(encoded_word_regex, part.get_payload()).groups()
@@ -80,7 +79,6 @@ def get_email_body(msg, message_type):
                     output = part.get_payload()
                 break
     elif 'text' in m_type and 'html' not in m_type:
-        encoding = part["Content-Type"].split()[1].split("=")[1].lower()
         try:
             encoded_word_regex = r'=\?{1}(.+)\?{1}([B|Q])\?{1}(.+)\?{1}='
             charset, encoding, encoded_text = re.match(encoded_word_regex, part.get_payload()).groups()
@@ -220,6 +218,7 @@ def get_emails_not_from_label(connectionAndLabel):
             msg_str = base64.urlsafe_b64decode(message['raw'].encode('ASCII'))
             mime_msg = email.message_from_bytes(msg_str)
             subject = ''
+            body = ''
             try:
                 encoded_word_regex = r'=\?{1}(.+)\?{1}([B|Q])\?{1}(.+)\?{1}='
                 charset, encoding, encoded_text = re.match(encoded_word_regex, mime_msg["Subject"]).groups()
@@ -273,7 +272,6 @@ def get_emails_from_label(connectionAndLabel):
         print("No messages")
     else:
         for msg in msgs:
-
             message = service.users().messages().get(
                 userId='me', id=msg["id"], format='raw').execute()
             # payload = message.get('payload')
