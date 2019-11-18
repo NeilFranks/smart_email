@@ -1,13 +1,14 @@
 import React, { Component, Fragment } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
-import { getEmailDetails } from "../../actions/emailDetails";
+import { getEmailDetails, addEmailDetails } from "../../actions/emailDetails";
 import { addTrainEmails, getTrainIds } from "../../actions/trainEmails";
 
 export class PickEmailList extends Component {
   static propTypes = {
     emailDetails: PropTypes.array.isRequired,
     getEmailDetails: PropTypes.func.isRequired,
+    addEmailDetails: PropTypes.func.isRequired,
     addTrainEmails: PropTypes.func.isRequired,
     trainIds: PropTypes.array.isRequired
   };
@@ -83,9 +84,30 @@ export class PickEmailList extends Component {
               ) : null
             )}
           </tbody>
+          <tfoot>
+            <tr>
+              <td>
+                <button
+                  onClick={() => this.loadMore(this.props.emailDetails)}
+                  className="btn btn-info"
+                >
+                  Load More
+                </button>
+              </td>
+              <td />
+            </tr>
+          </tfoot>
         </table>
       </Fragment>
     );
+  }
+
+  loadMore(emails) {
+    const last_email = emails[emails.length - 1];
+    const last_date = last_email.date;
+    const last_date_epoch = dateEpoch(new Date(last_date));
+    this.props.addEmailDetails(last_date_epoch);
+    this.render();
   }
 }
 
@@ -119,12 +141,17 @@ const dateString = someDate => {
   return newDate;
 };
 
+const dateEpoch = someDate => {
+  return someDate.getTime() / 1000;
+};
+
 const snippetPrepend = snippet => {
   return " - ".concat(snippet);
 };
 
 export default connect(mapStateToProps, {
   getEmailDetails,
+  addEmailDetails,
   addTrainEmails,
   getTrainIds
 })(PickEmailList);

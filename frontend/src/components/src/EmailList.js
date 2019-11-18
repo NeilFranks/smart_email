@@ -18,7 +18,17 @@ export class EmailList extends Component {
   render() {
     return (
       <Fragment>
-        <table className="table">
+        <button className="btn btn-success" onClick={() => this.prev()}>
+          Previous
+        </button>
+        <button
+          style={{ float: "right" }}
+          className="btn btn-success"
+          onClick={() => this.next(this.props.emailDetails)}
+        >
+          Next
+        </button>
+        <table className="table" style={{ fontSize: "smaller" }}>
           <tbody>
             {this.props.emailDetails.map(emailDetails =>
               emailDetails.unread ? (
@@ -101,15 +111,6 @@ export class EmailList extends Component {
             )}
           </tbody>
         </table>
-        <button className="btn btn-success" onClick={() => this.prev()}>
-          Previous
-        </button>
-        <button
-          className="btn btn-success"
-          onClick={() => this.next(this.props.emailDetails)}
-        >
-          Next
-        </button>
       </Fragment>
     );
   }
