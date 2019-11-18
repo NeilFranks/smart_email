@@ -150,7 +150,7 @@ const dateString = someDate => {
 
   const newDate = isToday
     ? someDate.toLocaleTimeString()
-    : someDate.toLocaleTimeString();
+    : someDate.toLocaleDateString();
 
   return newDate;
 };
