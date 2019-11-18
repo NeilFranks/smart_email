@@ -8,7 +8,7 @@ import dateutil.parser
 import multiprocessing as mp
 
 # If modifying these scopes, delete the stored token.
-SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
+SCOPES = ['https://mail.google.com/']
 
 
 def connect_new_account(app_token):
@@ -158,9 +158,107 @@ def get_email_details_from_account(connectionAndN):
 
     return detailsList
 
+def create_message(sender, to, subject, message_text):
+  """Create a message for an email using sender, to, subject, & message_text as inputs
+  Returns an object containing a base64url encoded email object.
+  """
+  message = MIMEText(message_text)
+  message['to'] = to
+  message['from'] = sender
+  message['subject'] = subject
+  encoded_message = urlsafe_b64encode(message.as_bytes())
+  return {'raw': encoded_message.decode()}
+
+def create_label(account, label_object, app_token):
+  connections = retrieve_accounts(app_token)
+  for connection in connections:
+      if account == connection.get("address"):
+          creds = connection.get("creds")
+          service = build('gmail', 'v1', credentials=creds)
+          label = service.users().labels().create(userId=account, body=label_object)
+
+
+def batch_unmark_from_something(account, list_of_ids, list_of_labels, app_token):
+  connections = retrieve_accounts(app_token)
+  for connection in connections:
+      if account == connection.get("address"):
+          creds = connection.get("creds")
+          service = build('gmail', 'v1', credentials=creds)
+          messages = service.users().messages().batchModify(userId='me', body={'ids' : list_of_ids, 'removeLabelIds' : list_of_labels}).execute()
+
+def batch_mark_as_something(account, list_of_ids, list_of_labels, app_token):
+  connections = retrieve_accounts(app_token)
+  for connection in connections:
+      if account == connection.get("address"):
+          creds = connection.get("creds")
+          service = build('gmail', 'v1', credentials=creds)
+          messages = service.users().messages().batchModify(userId='me', body={'ids' : list_of_ids, 'addLabelIds' : list_of_labels}).execute()
+
+
+def single_mark_as_read(account, message_id, app_token):
+  connections = retrieve_accounts(app_token)
+  for connection in connections:
+      if account == connection.get("address"):
+          creds = connection.get("creds")
+          service = build('gmail', 'v1', credentials=creds)
+          message = service.users().messages().modify(userId='me', id=message_id, body={'removeLabelIds' : ['UNREAD']}).execute()
+
+def single_mark_as_unread(account, message_id, app_token):
+  connections = retrieve_accounts(app_token)
+  for connection in connections:
+      if account == connection.get("address"):
+          creds = connection.get("creds")
+          service = build('gmail', 'v1', credentials=creds)
+          message = service.users().messages().modify(userId='me', id=message_id, body={'addLabelIds' : ['UNREAD']}).execute()
+
+def batch_mark_as_read(account, list_of_ids, app_token):
+  connections = retrieve_accounts(app_token)
+  for connection in connections:
+      if account == connection.get("address"):
+          creds = connection.get("creds")
+          service = build('gmail', 'v1', credentials=creds)
+          messages = service.users().messages().batchModify(userId='me', body={'ids' : list_of_ids, 'removeLabelIds' : ['UNREAD']}).execute()
+
+def batch_mark_as_unread(account, list_of_ids, app_token):
+  connections = retrieve_accounts(app_token)
+  for connection in connections:
+      if account == connection.get("address"):
+          creds = connection.get("creds")
+          service = build('gmail', 'v1', credentials=creds)
+          messages = service.users().messages().batchModify(userId='me', body={'ids' : list_of_ids, 'addLabelIds' : ['UNREAD']}).execute()
+
+def trash_message(account, message_id, app_token):
+  connections = retrieve_accounts(app_token)
+  for connection in connections:
+      if account == connection.get("address"):
+          creds = connection.get("creds")
+          service = build('gmail', 'v1', credentials=creds)
+          service.users().messages().trash(userId=account, id=message_id).execute()
+
+def create_reply(sender, to, subject, message_text, threadId, messageId):
+  message = MIMEText(message_text)
+  message['to'] = to
+  message['from'] = sender
+  message['subject'] = subject
+
+  message['threadId'] = threadId
+  message["In-Reply-To"] = messageId
+  message["References"] = messageId
+  encoded_message = urlsafe_b64encode(message.as_bytes())
+  return {'raw': encoded_message.decode()}
+
+def send_message(account, message, app_token):
+  try:
+    message = (service.users().messages().send(userId=user_id, body=message)
+               .execute())
+    print('Message Id: %s' % message['id'])
+    return message
+  #except errors.HttpError, error:
+  except:
+    print('An error occurred: %s' % error)
 
 if __name__ == '__main__':
-    tok = "452b8c9c861bb56d20df5d54b71931db8b04dbe9108441c1b35a10adb2e13d06"
+    tok = "5333867a0eeb9d3f7c29eb404ced841e663ba0816aeeffbe10d3c6e3396d2538"
     bil = get_email_details("neilcapstonetest@gmail.com", 2, tok)
     hum = get_single_email("neilcapstonetest@gmail.com",
                            '16e1ffd1248982ac', tok)
