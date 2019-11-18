@@ -4,6 +4,8 @@ import PropTypes from "prop-types";
 import { getEmailDetails } from "../../actions/emailDetails";
 
 export class EmailList extends Component {
+  page_times = [];
+
   static propTypes = {
     emailDetails: PropTypes.array.isRequired,
     getEmailDetails: PropTypes.func.isRequired
@@ -99,8 +101,38 @@ export class EmailList extends Component {
             )}
           </tbody>
         </table>
+        <button className="btn btn-success" onClick={() => this.prev()}>
+          Previous
+        </button>
+        <button
+          className="btn btn-success"
+          onClick={() => this.next(this.props.emailDetails)}
+        >
+          Next
+        </button>
       </Fragment>
     );
+  }
+
+  prev() {
+    const prev_page_timestamp = this.page_times.pop();
+    this.props.getEmailDetails(prev_page_timestamp);
+    this.render();
+  }
+
+  next(emails) {
+    // first, save of most recent email time stamp so you can page back to this page later
+    const first_email = emails[0];
+    const first_date = first_email.date;
+    const first_date_epoch = dateEpoch(new Date(first_date));
+    this.page_times.push(first_date_epoch + 60);
+
+    // now, load next set of emails
+    const last_email = emails[emails.length - 1];
+    const last_date = last_email.date;
+    const last_date_epoch = dateEpoch(new Date(last_date));
+    this.props.getEmailDetails(last_date_epoch);
+    this.render();
   }
 }
 
@@ -117,16 +149,19 @@ const dateString = someDate => {
 
   const newDate = isToday
     ? someDate.toLocaleTimeString()
-    : someDate.toLocaleDateString();
+    : someDate.toLocaleTimeString();
 
   return newDate;
+};
+
+const dateEpoch = someDate => {
+  return someDate.getTime() / 1000;
 };
 
 const snippetPrepend = snippet => {
   return " - ".concat(snippet);
 };
 
-export default connect(
-  mapStateToProps,
-  { getEmailDetails }
-)(EmailList);
+export default connect(mapStateToProps, {
+  getEmailDetails
+})(EmailList);

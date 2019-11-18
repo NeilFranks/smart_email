@@ -85,7 +85,6 @@ class EmailDetailsViewSet(viewsets.GenericViewSet):
 
     def post(self, request):
         data = request.data
-        n = data.get("n")
         try:
             # auth is in headers like this when request comes from front end
             headers = data.get("headers")
@@ -94,7 +93,11 @@ class EmailDetailsViewSet(viewsets.GenericViewSet):
             # auth is like this when request comes from postman
             token = request.META.get('HTTP_AUTHORIZATION')
 
-        detailsList = {"detailsList": get_email_details(n, token)}
+        n = data.get("n")
+        before_time = data.get("before_time")
+        detailsList = {"detailsList": get_email_details(
+            n, before_time, token)}
+
         results = EmailDetailsSerializer(detailsList).data
         return Response(results)
 

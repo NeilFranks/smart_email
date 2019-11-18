@@ -4,12 +4,15 @@ import { tokenConfig } from "./auth";
 
 import { GET_EMAILDETAILS, GET_CONNECTEDACCOUNTS } from "./types";
 
-export const getEmailDetails = addressList => (dispatch, getState) => {
+export const getEmailDetails = before_time => (dispatch, getState) => {
+  if (before_time == null) {
+    before_time = Math.floor(Date.now() / 1000);
+  }
   axios
     .post("/api/emailDetails/", tokenConfig(getState), {
       data: {
-        addressList: addressList,
-        n: "15"
+        n: "15",
+        before_time: before_time
       }
     })
     .then(res => {

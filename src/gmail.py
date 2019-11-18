@@ -93,7 +93,7 @@ def get_email_body(msg, message_type):
     return output
 
 
-def get_email_details(n, app_token):
+def get_email_details(n, before_time, app_token):
     '''
     Returns id, date (and time), from, and subject of the most recent n emails sent to the address.
     '''
@@ -106,7 +106,7 @@ def get_email_details(n, app_token):
 
     # Step 2: `pool.map` the `get_email_details_from_account()`
     detailsList = pool.map(get_email_details_from_account, [(
-        connection, n) for connection in connections])  # Returns a list of lists
+        connection, n, before_time) for connection in connections])  # Returns a list of lists
 
     # Flatten the list of lists
     detailsList = [ent for sublist in detailsList for ent in sublist]
@@ -319,11 +319,12 @@ def get_email_details_from_account(connectionAndN):
 
     connection = connectionAndN[0]
     n = connectionAndN[1]
+    before_time = connectionAndN[2]
 
     # get access to emails
     creds = connection.get("creds")
     service = build('gmail', 'v1', credentials=creds)
-    results = service.users().messages().list(userId='me', maxResults=n).execute()
+    results = service.users().messages().list(userId='me', maxResults=n, q="before:{}".format(before_time)).execute()
     labels = results.get('messages', [])
 
     if not labels:
@@ -371,7 +372,7 @@ def get_email_details_from_account(connectionAndN):
 
 
 if __name__ == '__main__':
-    tok = "d4d7aca543e0c5b96e795f71956c8323e05cad6c05791b069a9fb9444a530808"
-    bil = get_email_details(2, tok)
+    tok = "5e0506368442c50d1cdfaa1712c206bd8f71b11bed834a4e9eaa338db8ff5a85"
+    bil = get_email_details(2, None, tok)
     #hum = get_single_email("capstonespamtest@gmail.com",
                            #'16e1ffd1248982ac', tok)
