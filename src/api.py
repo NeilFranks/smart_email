@@ -29,6 +29,7 @@ from .serializers import (
 from .learn import mcw_from_label
 
 import json
+import time
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -351,12 +352,17 @@ class CreateLabelViewSet(viewsets.GenericViewSet):
 
         # create the label in GMail world
         label_object = {
+            "labelListVisibility": "labelShow",
             "messageListVisibility": "show",
             "name": label,
-            "labelListVisibility": "labelShow",
         }
         create_label_response = create_label(label_object, token)
-        if create_label_response and create_label_response.status != 200:
+        # check if there was an error with creating the label
+        if (
+            hasattr(create_label_response, "status")
+            and create_label_response.status != 200
+        ):
+            # return the error without any additional action
             return Response(
                 data=create_label_response, status=create_label_response.status
             )
@@ -370,7 +376,8 @@ class CreateLabelViewSet(viewsets.GenericViewSet):
             else:
                 addressDict[address] = [email.get("id")]
 
-        batch_mark_as_something(addressDict, [label], token)
+        labelId = create_label_response["id"]
+        batch_mark_as_something(addressDict, [labelId], token)
 
         # train a model
 

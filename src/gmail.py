@@ -430,7 +430,7 @@ def create_label(label_object, app_token):
                 .create(userId="me", body=label_object)
                 .execute()
             )
-            print(label)
+            return label
         except googleapiclient.errors.HttpError as e:
             print(e)
             return e.resp
@@ -459,9 +459,6 @@ def batch_mark_as_something(addressDict, list_of_labels, app_token):
         connections = retrieve_accounts(app_token)
         for connection in connections:
             if address == connection.get("address"):
-                print("doing it big time to %s" % list_of_labels)
-                print("with %s" % list_of_ids)
-                print("for %s" % address)
                 creds = connection.get("creds")
                 service = build("gmail", "v1", credentials=creds)
                 messages = (
