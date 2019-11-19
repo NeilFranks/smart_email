@@ -245,6 +245,47 @@ def mcw_from_label(label, app_token):
     print(prediction)
     return mcw
 
+    # This naming is going to have to change.
+
+
+def classifier_from_label(label, app_token):
+    email_list = get_email_details_from_label(label, app_token)
+    second_list = get_emails_details_not_from_label(label, app_token, len(email_list))
+    full_list = second_list + email_list
+    word_list = []
+    for email in full_list:
+        email_body = email["body"]
+        email_body = (
+            email_body.replace("=0A", " ")
+            .replace("=C2", " ")
+            .replace("=A0", " ")
+            .replace("=3F", "?")
+        )
+        email_subj = email["subject"]
+        email_subj = (
+            email_subj.replace("=0A", " ")
+            .replace("=C2", " ")
+            .replace("=A0", " ")
+            .replace("=3F", "?")
+        )
+        subj_list = email_subj.split()
+        body_list = email_body.split()
+        word_list += body_list
+        word_list += subj_list
+    mcw = Counter(word_list)
+    remove_common_words(mcw)
+    mcw = mcw.most_common(200)
+    train_labels = np.zeros(len(full_list))
+    train_labels[len(email_list) :] = 1
+
+    train_matrix = extract_features(mcw, full_list)
+
+    # create and return classifier
+    SVC = LinearSVC()
+    SVC.fit(train_matrix, train_labels)
+
+    return SVC
+
 
 def extract_features(mcw, emails):
     features_matrix = np.zeros((len(emails), 200))

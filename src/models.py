@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 class Category(models.Model):
     name = models.TextField()
     classifier = models.TextField()
-    time = models.DateTimeField()
+    time = models.DateTimeField(blank=True, null=True)
     owner = models.ForeignKey(
         User, related_name="category", on_delete=models.CASCADE, null=True
     )

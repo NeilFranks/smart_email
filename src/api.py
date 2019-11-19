@@ -26,9 +26,16 @@ from .serializers import (
     EmailsFromLabelSerializer,
     McwFromLabelSerializer,
 )
-from .learn import mcw_from_label
+from rest_framework.authtoken.models import Token
 
+from .learn import classifier_from_label
+from .models import Category
+
+import codecs
 import json
+import os
+import pickle
+import requests
 import time
 
 
@@ -380,6 +387,27 @@ class CreateLabelViewSet(viewsets.GenericViewSet):
         batch_mark_as_something(addressDict, [labelId], token)
 
         # train a model
+        SVC = classifier_from_label(label, token)
 
-        return Response(data=label, status=200)
+        # save to database
+        pickledSVC = codecs.encode(pickle.dumps(SVC), "base64").decode()
+        print(pickledSVC)
 
+        response = requests.post(
+            "%s/api/category/" % baseURL(),
+            headers={"Authorization": token},
+            json={"name": label, "classifier": pickledSVC},
+        )
+
+        return Response(data=response, status=response.status_code)
+
+
+def baseURL():
+    # in Procfile for heroku, BASE_URL should be set to `export BASE_URL=https://capstone-smart-email.herokuapp.com/`
+    try:
+        baseURL = os.environ["BASE_URL"]
+    except KeyError:
+        baseURL = "http://127.0.0.1:8000"
+
+    # print("baseURL set to %s" % baseURL)
+    return baseURL
