@@ -3,12 +3,11 @@ import {
   GET_EMAILDETAILS,
   ADD_EMAILDETAILS,
   GET_CONNECTEDACCOUNTS,
-  HIDE_EMAIL,
-  UNHIDE_EMAIL,
-  GET_EMAILDETAILSFROMLABEL
+  SET_SELECTEDLABEL
 } from "../actions/types.js";
 
 const initialState = {
+  selectedLabel: "",
   emailDetails: [],
   connectedAccounts: []
 };
@@ -28,28 +27,15 @@ export default function(state = initialState, action) {
         ...state,
         emailDetails: action.payload
       };
-    case GET_EMAILDETAILSFROMLABEL:
-      console.log(action.payload);
+    case SET_SELECTEDLABEL:
       return {
         ...state,
-        emailDetails: action.payload
+        selectedLabel: action.payload
       };
     case GET_CONNECTEDACCOUNTS:
       return {
         ...state,
         connectedAccounts: action.payload
-      };
-    case HIDE_EMAIL:
-      return {
-        ...state,
-        emailDetails: state.emailDetails.filter(
-          emailDetails => emailDetails.id !== action.payload
-        )
-      };
-    case UNHIDE_EMAIL:
-      return {
-        ...state,
-        emailDetails: [...state.emailDetails, action.payload]
       };
     default:
       return state;

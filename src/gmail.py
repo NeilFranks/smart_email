@@ -353,18 +353,22 @@ def get_email_details_from_account(connectionAndN):
     connection = connectionAndN[0]
     n = connectionAndN[1]
     before_time = connectionAndN[2]
-    label_id = connectionAndN[3]
+    label_dict = connectionAndN[
+        3
+    ]  # label_dict is a dictionary; keys are email addresses, values are associated label_ids
 
     # get access to emails
     creds = connection.get("creds")
     service = build("gmail", "v1", credentials=creds)
-    if label_id:
+    if label_dict:
+        address = connection.get("address")
+        list_of_labels = label_dict[address]
         results = (
             service.users()
             .messages()
             .list(
                 userId="me",
-                labelIds=[label_id],
+                labelIds=list_of_labels,
                 maxResults=n,
                 q="before:{}".format(before_time),
             )
@@ -433,6 +437,10 @@ def get_email_details_from_account(connectionAndN):
 
 
 def create_label(label_object, app_token):
+    labelDict = (
+        dict()
+    )  # for associating an email address with the label ID this new label corresponds to
+
     connections = retrieve_accounts(app_token)
     for connection in connections:
         creds = connection.get("creds")
@@ -444,10 +452,12 @@ def create_label(label_object, app_token):
                 .create(userId="me", body=label_object)
                 .execute()
             )
-            return label
+            address = connection.get("address")
+            labelDict[address] = [label["id"]]
         except googleapiclient.errors.HttpError as e:
             print(e)
             return e.resp
+    return labelDict
 
 
 def batch_unmark_from_something(account, list_of_ids, list_of_labels, app_token):
@@ -467,12 +477,13 @@ def batch_unmark_from_something(account, list_of_ids, list_of_labels, app_token)
             )
 
 
-def batch_mark_as_something(addressDict, list_of_labels, app_token):
+def batch_mark_as_something(addressDict, label_dict, app_token):
     for address in addressDict:
         list_of_ids = addressDict[address]
         connections = retrieve_accounts(app_token)
         for connection in connections:
             if address == connection.get("address"):
+                list_of_labels = label_dict[address]
                 creds = connection.get("creds")
                 service = build("gmail", "v1", credentials=creds)
                 messages = (

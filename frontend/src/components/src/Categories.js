@@ -6,7 +6,7 @@ import {
   getCategory,
   deleteCategory
 } from "../../actions/categories";
-import { getEmailDetailsFromLabel } from "../../actions/emailDetails";
+import { getEmailDetails } from "../../actions/emailDetails";
 
 export class Categories extends Component {
   static propTypes = {
@@ -15,7 +15,7 @@ export class Categories extends Component {
     getCategory: PropTypes.func.isRequired,
     deleteCategory: PropTypes.func.isRequired,
     emailDetails: PropTypes.array.isRequired,
-    getEmailDetailsFromLabel: PropTypes.func.isRequired
+    getEmailDetails: PropTypes.func.isRequired
   };
 
   componentDidMount() {
@@ -27,8 +27,7 @@ export class Categories extends Component {
   }
 
   getEmailsFromLabel = label_id => {
-    console.log(label_id);
-    this.props.getEmailDetailsFromLabel(null, label_id);
+    this.props.getEmailDetails(null, label_id);
   };
 
   render() {
@@ -37,8 +36,8 @@ export class Categories extends Component {
         <Fragment>
           <table className="table">
             <thead>
-              <tr>
-                <th>All Categories</th>
+              <tr onClick={() => this.getEmailsFromLabel()}>
+                <th style={{ fontWeight: "normal" }}>All Categories</th>
                 {/* for deletion: */}
                 <th />
               </tr>
@@ -57,9 +56,9 @@ export class Categories extends Component {
                         category.id
                       )}
                       className="btn btn-danger btn-sm"
+                      style={{ width: "30px" }}
                     >
-                      {" "}
-                      Delete
+                      ✖
                     </button>
                   </td>
                 </tr>
@@ -67,30 +66,16 @@ export class Categories extends Component {
             </tbody>
             <tfoot>
               <tr>
-                <td
-                  style={{
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    width: "80%",
-                    maxWidth: "0"
-                  }}
-                >
+                <td>
                   <i>New Category</i>
                 </td>
-                <td
-                  align="right"
-                  style={{
-                    whiteSpace: "nowrap",
-                    width: "20%",
-                    maxWidth: "0"
-                  }}
-                >
+                <td>
                   <button
                     onClick={this.navToMakeCategory}
                     className="btn btn-primary btn-sm"
+                    style={{ width: "30px" }}
                   >
-                    +
+                    <strong>＋</strong>
                   </button>
                 </td>
               </tr>
@@ -111,5 +96,5 @@ export default connect(mapStateToProps, {
   getCategory,
   deleteCategory,
   addCategory,
-  getEmailDetailsFromLabel
+  getEmailDetails
 })(Categories);

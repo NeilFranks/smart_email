@@ -119,7 +119,9 @@ class EmailDetailsViewSet(viewsets.GenericViewSet):
 
         n = data.get("n")
         before_time = data.get("before_time")
-        label_id = data.get("label_id")
+        encoded_label_id = data.get("label_id")
+        label_id = pickle.loads(codecs.decode(encoded_label_id.encode(), "base64"))
+
         detailsList = {
             "detailsList": get_email_details(n, before_time, label_id, token)
         }
@@ -386,18 +388,26 @@ class CreateLabelViewSet(viewsets.GenericViewSet):
             else:
                 addressDict[address] = [email.get("id")]
 
-        labelId = create_label_response["id"]
-        batch_mark_as_something(addressDict, [labelId], token)
+        # create_label_response should be a dictionary; keys are email addresses, values are associated label_id for the label
+        batch_mark_as_something(addressDict, create_label_response, token)
 
         # train a model
         SVC = classifier_from_label(label, token)
 
         # save to database
         pickledSVC = codecs.encode(pickle.dumps(SVC), "base64").decode()
+        pickledLabelDict = codecs.encode(
+            pickle.dumps(create_label_response), "base64"
+        ).decode()
+
         response = requests.post(
             "%s/api/category/" % baseURL(),
             headers={"Authorization": token},
-            json={"name": label, "label_id": labelId, "classifier": pickledSVC},
+            json={
+                "name": label,
+                "label_id": pickledLabelDict,
+                "classifier": pickledSVC,
+            },
         )
 
         return Response(data=response, status=response.status_code)

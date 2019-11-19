@@ -8,7 +8,8 @@ export class EmailList extends Component {
 
   static propTypes = {
     emailDetails: PropTypes.array.isRequired,
-    getEmailDetails: PropTypes.func.isRequired
+    getEmailDetails: PropTypes.func.isRequired,
+    selectedLabel: PropTypes.string
   };
 
   componentDidMount() {
@@ -121,7 +122,7 @@ export class EmailList extends Component {
 
   prev() {
     const prev_page_timestamp = this.page_times.pop();
-    this.props.getEmailDetails(prev_page_timestamp);
+    this.props.getEmailDetails(prev_page_timestamp, this.props.selectedLabel);
     this.render();
   }
 
@@ -136,13 +137,14 @@ export class EmailList extends Component {
     const last_email = emails[emails.length - 1];
     const last_date = last_email.date;
     const last_date_epoch = dateEpoch(new Date(last_date));
-    this.props.getEmailDetails(last_date_epoch);
+    this.props.getEmailDetails(last_date_epoch, this.props.selectedLabel);
     this.render();
   }
 }
 
 const mapStateToProps = state => ({
-  emailDetails: state.emailDetails.emailDetails // get reducer, then get its actual et
+  emailDetails: state.emailDetails.emailDetails,
+  selectedLabel: state.emailDetails.selectedLabel
 });
 
 const dateString = someDate => {

@@ -6,40 +6,16 @@ import {
   GET_EMAILDETAILS,
   ADD_EMAILDETAILS,
   GET_CONNECTEDACCOUNTS,
-  GET_EMAILDETAILSFROMLABEL
+  SET_SELECTEDLABEL
 } from "./types";
 
-export const getEmailDetails = before_time => (dispatch, getState) => {
-  if (before_time == null) {
-    before_time = Math.floor(Date.now() / 1000);
-  }
-  axios
-    .post("/api/emailDetails/", tokenConfig(getState), {
-      data: {
-        n: "15",
-        before_time: before_time
-      }
-    })
-    .then(res => {
-      dispatch({
-        type: GET_EMAILDETAILS,
-        payload: res.data.detailsList
-      });
-    })
-    .catch(err =>
-      dispatch(returnErrors(err.response.data, err.response.status))
-    );
-};
-
-export const getEmailDetailsFromLabel = (before_time, label_id) => (
+export const getEmailDetails = (before_time, label_id) => (
   dispatch,
   getState
 ) => {
   if (before_time == null) {
     before_time = Math.floor(Date.now() / 1000);
   }
-  console.log("gum");
-  console.log(label_id);
   axios
     .post("/api/emailDetails/", tokenConfig(getState), {
       data: {
@@ -50,7 +26,11 @@ export const getEmailDetailsFromLabel = (before_time, label_id) => (
     })
     .then(res => {
       dispatch({
-        type: GET_EMAILDETAILSFROMLABEL,
+        type: SET_SELECTEDLABEL,
+        payload: label_id
+      });
+      dispatch({
+        type: GET_EMAILDETAILS,
         payload: res.data.detailsList
       });
     })
