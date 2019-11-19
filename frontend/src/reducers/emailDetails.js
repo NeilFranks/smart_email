@@ -4,7 +4,8 @@ import {
   ADD_EMAILDETAILS,
   GET_CONNECTEDACCOUNTS,
   HIDE_EMAIL,
-  UNHIDE_EMAIL
+  UNHIDE_EMAIL,
+  GET_EMAILDETAILSFROMLABEL
 } from "../actions/types.js";
 
 const initialState = {
@@ -23,6 +24,12 @@ export default function(state = initialState, action) {
         emailDetails: emails
       };
     case GET_EMAILDETAILS:
+      return {
+        ...state,
+        emailDetails: action.payload
+      };
+    case GET_EMAILDETAILSFROMLABEL:
+      console.log(action.payload);
       return {
         ...state,
         emailDetails: action.payload

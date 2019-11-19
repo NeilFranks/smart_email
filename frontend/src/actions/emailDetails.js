@@ -5,7 +5,8 @@ import { tokenConfig } from "./auth";
 import {
   GET_EMAILDETAILS,
   ADD_EMAILDETAILS,
-  GET_CONNECTEDACCOUNTS
+  GET_CONNECTEDACCOUNTS,
+  GET_EMAILDETAILSFROMLABEL
 } from "./types";
 
 export const getEmailDetails = before_time => (dispatch, getState) => {
@@ -22,6 +23,34 @@ export const getEmailDetails = before_time => (dispatch, getState) => {
     .then(res => {
       dispatch({
         type: GET_EMAILDETAILS,
+        payload: res.data.detailsList
+      });
+    })
+    .catch(err =>
+      dispatch(returnErrors(err.response.data, err.response.status))
+    );
+};
+
+export const getEmailDetailsFromLabel = (before_time, label_id) => (
+  dispatch,
+  getState
+) => {
+  if (before_time == null) {
+    before_time = Math.floor(Date.now() / 1000);
+  }
+  console.log("gum");
+  console.log(label_id);
+  axios
+    .post("/api/emailDetails/", tokenConfig(getState), {
+      data: {
+        n: "15",
+        before_time: before_time,
+        label_id: label_id
+      }
+    })
+    .then(res => {
+      dispatch({
+        type: GET_EMAILDETAILSFROMLABEL,
         payload: res.data.detailsList
       });
     })

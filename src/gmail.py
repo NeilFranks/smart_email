@@ -101,7 +101,7 @@ def get_email_body(msg, message_type):
     return output
 
 
-def get_email_details(n, before_time, app_token):
+def get_email_details(n, before_time, label_id, app_token):
     """
     Returns id, date (and time), from, and subject of the most recent n emails sent to the address.
     """
@@ -115,7 +115,7 @@ def get_email_details(n, before_time, app_token):
     # Step 2: `pool.map` the `get_email_details_from_account()`
     detailsList = pool.map(
         get_email_details_from_account,
-        [(connection, n, before_time) for connection in connections],
+        [(connection, n, before_time, label_id) for connection in connections],
     )  # Returns a list of lists
 
     # Flatten the list of lists
@@ -353,16 +353,30 @@ def get_email_details_from_account(connectionAndN):
     connection = connectionAndN[0]
     n = connectionAndN[1]
     before_time = connectionAndN[2]
+    label_id = connectionAndN[3]
 
     # get access to emails
     creds = connection.get("creds")
     service = build("gmail", "v1", credentials=creds)
-    results = (
-        service.users()
-        .messages()
-        .list(userId="me", maxResults=n, q="before:{}".format(before_time))
-        .execute()
-    )
+    if label_id:
+        results = (
+            service.users()
+            .messages()
+            .list(
+                userId="me",
+                labelIds=[label_id],
+                maxResults=n,
+                q="before:{}".format(before_time),
+            )
+            .execute()
+        )
+    else:
+        results = (
+            service.users()
+            .messages()
+            .list(userId="me", maxResults=n, q="before:{}".format(before_time))
+            .execute()
+        )
     labels = results.get("messages", [])
 
     if not labels:

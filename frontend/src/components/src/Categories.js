@@ -6,13 +6,16 @@ import {
   getCategory,
   deleteCategory
 } from "../../actions/categories";
+import { getEmailDetailsFromLabel } from "../../actions/emailDetails";
 
 export class Categories extends Component {
   static propTypes = {
     categories: PropTypes.array.isRequired,
     addCategory: PropTypes.func.isRequired,
     getCategory: PropTypes.func.isRequired,
-    deleteCategory: PropTypes.func.isRequired
+    deleteCategory: PropTypes.func.isRequired,
+    emailDetails: PropTypes.array.isRequired,
+    getEmailDetailsFromLabel: PropTypes.func.isRequired
   };
 
   componentDidMount() {
@@ -20,9 +23,13 @@ export class Categories extends Component {
   }
 
   navToMakeCategory() {
-    console.log("gagae");
     window.location.href = "makeCategory";
   }
+
+  getEmailsFromLabel = label_id => {
+    console.log(label_id);
+    this.props.getEmailDetailsFromLabel(null, label_id);
+  };
 
   render() {
     return (
@@ -31,14 +38,17 @@ export class Categories extends Component {
           <table className="table">
             <thead>
               <tr>
-                <th>Categories</th>
+                <th>All Categories</th>
                 {/* for deletion: */}
                 <th />
               </tr>
             </thead>
             <tbody>
               {this.props.categories.map(category => (
-                <tr key={category.id}>
+                <tr
+                  key={category.id}
+                  onClick={() => this.getEmailsFromLabel(category.label_id)}
+                >
                   <td>{category.name}</td>
                   <td>
                     <button
@@ -93,11 +103,13 @@ export class Categories extends Component {
 }
 
 const mapStateToProps = state => ({
-  categories: state.categories.categories // get reducer, then get its actual et
+  categories: state.categories.categories,
+  emailDetails: state.emailDetails.emailDetails
 });
 
 export default connect(mapStateToProps, {
   getCategory,
   deleteCategory,
-  addCategory
+  addCategory,
+  getEmailDetailsFromLabel
 })(Categories);

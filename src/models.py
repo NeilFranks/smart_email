@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 
 class Category(models.Model):
     name = models.TextField()
+    label_id = models.TextField()
     classifier = models.TextField()
     time = models.DateTimeField(blank=True, null=True)
     owner = models.ForeignKey(

@@ -119,7 +119,10 @@ class EmailDetailsViewSet(viewsets.GenericViewSet):
 
         n = data.get("n")
         before_time = data.get("before_time")
-        detailsList = {"detailsList": get_email_details(n, before_time, token)}
+        label_id = data.get("label_id")
+        detailsList = {
+            "detailsList": get_email_details(n, before_time, label_id, token)
+        }
 
         results = EmailDetailsSerializer(detailsList).data
         return Response(results)
@@ -391,12 +394,10 @@ class CreateLabelViewSet(viewsets.GenericViewSet):
 
         # save to database
         pickledSVC = codecs.encode(pickle.dumps(SVC), "base64").decode()
-        print(pickledSVC)
-
         response = requests.post(
             "%s/api/category/" % baseURL(),
             headers={"Authorization": token},
-            json={"name": label, "classifier": pickledSVC},
+            json={"name": label, "label_id": labelId, "classifier": pickledSVC},
         )
 
         return Response(data=response, status=response.status_code)
