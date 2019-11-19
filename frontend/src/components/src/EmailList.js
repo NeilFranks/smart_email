@@ -18,11 +18,15 @@ export class EmailList extends Component {
   render() {
     return (
       <Fragment>
-        <button className="btn btn-success" onClick={() => this.prev()}>
+        <button
+          className="btn btn-success"
+          onClick={() => this.prev()}
+          style={{ fontSize: "small" }}
+        >
           Previous
         </button>
         <button
-          style={{ float: "right" }}
+          style={{ float: "right", fontSize: "small" }}
           className="btn btn-success"
           onClick={() => this.next(this.props.emailDetails)}
         >
