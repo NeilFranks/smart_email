@@ -29,7 +29,6 @@ from .serializers import (
 from .learn import mcw_from_label
 
 import json
-import requests
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -356,9 +355,8 @@ class CreateLabelViewSet(viewsets.GenericViewSet):
             "name": label,
             "labelListVisibility": "labelShow",
         }
-        print(requests.codes.ok)
         create_label_response = create_label(label_object, token)
-        if create_label_response and create_label_response.status != requests.codes.ok:
+        if create_label_response and create_label_response.status != 200:
             return Response(
                 data=create_label_response, status=create_label_response.status
             )
