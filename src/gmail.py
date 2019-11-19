@@ -183,54 +183,6 @@ def get_emails_details_not_from_label(label, app_token, size):
     return detailsList
 
 
-def get_email_details_from_label(label, app_token):
-    '''
-    Returns id, date (and time), from, and subject of the most recent n emails sent to the address.
-    '''
-
-    connections = retrieve_accounts(app_token)
-    detailsList = []
-
-    # Step 1: Init multiprocessing.Pool()
-    pool = mp.Pool(mp.cpu_count())
-
-    # Step 2: `pool.map` the `get_email_details_from_account()`
-    detailsList = pool.map(get_emails_from_label, [(
-        connection, label) for connection in connections])  # Returns a list of lists
-
-    # Flatten the list of lists
-    detailsList = [ent for sublist in detailsList for ent in sublist]
-
-    # Step 3: Don't forget to close
-    pool.close()
-
-    return detailsList
-
-
-def get_emails_details_not_from_label(label, app_token, size):
-    '''
-    Returns id, date (and time), from, and subject of the most recent n emails sent to the address.
-    '''
-
-    connections = retrieve_accounts(app_token)
-    detailsList = []
-
-    # Step 1: Init multiprocessing.Pool()
-    pool = mp.Pool(mp.cpu_count())
-
-    # Step 2: `pool.map` the `get_email_details_from_account()`
-    detailsList = pool.map(get_emails_not_from_label, [(
-        connection, label, size) for connection in connections])  # Returns a list of lists
-
-    # Flatten the list of lists
-    detailsList = [ent for sublist in detailsList for ent in sublist]
-
-    # Step 3: Don't forget to close
-    pool.close()
-
-    return detailsList
-
-
 def get_connected_addresses(app_token):
     """
     Returns list of email addresses associated with the user
