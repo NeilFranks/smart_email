@@ -1,14 +1,28 @@
-from .gmail import connect_new_account, get_single_email, get_email_details, get_connected_addresses, get_emails_from_label, get_email_details_from_label
+from .gmail import (
+    connect_new_account,
+    get_single_email,
+    get_email_details,
+    get_connected_addresses,
+    get_emails_from_label,
+    get_email_details_from_label,
+)
 from rest_framework.response import Response
 from rest_framework import viewsets, permissions
-from .serializers import CategorySerializer, ConnectNewEmailSerializer, ConnectNewAccountSerializer, SingleEmailSerializer, EmailDetailsSerializer, ConnectedAddressesSerializer, EmailsFromLabelSerializer, McwFromLabelSerializer
+from .serializers import (
+    CategorySerializer,
+    ConnectNewEmailSerializer,
+    ConnectNewAccountSerializer,
+    SingleEmailSerializer,
+    EmailDetailsSerializer,
+    ConnectedAddressesSerializer,
+    EmailsFromLabelSerializer,
+    McwFromLabelSerializer,
+)
 from .learn import mcw_from_label
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
-    permissions_classes = [
-        permissions.IsAuthenticated,
-    ]
+    permissions_classes = [permissions.IsAuthenticated]
 
     serializer_class = CategorySerializer
 
@@ -20,9 +34,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
 
 
 class ConnectedEmailViewSet(viewsets.ModelViewSet):
-    permissions_classes = [
-        permissions.IsAuthenticated,
-    ]
+    permissions_classes = [permissions.IsAuthenticated]
 
     serializer_class = ConnectNewEmailSerializer
 
@@ -34,9 +46,7 @@ class ConnectedEmailViewSet(viewsets.ModelViewSet):
 
 
 class ConnectNewAccountViewSet(viewsets.GenericViewSet):
-    permissions_classes = [
-        permissions.IsAuthenticated,
-    ]
+    permissions_classes = [permissions.IsAuthenticated]
 
     serializer_class = ConnectNewAccountSerializer
 
@@ -48,7 +58,7 @@ class ConnectNewAccountViewSet(viewsets.GenericViewSet):
             token = headers.get("Authorization")
         except AttributeError:
             # auth is like this when request comes from postman
-            token = request.META.get('HTTP_AUTHORIZATION')
+            token = request.META.get("HTTP_AUTHORIZATION")
 
         content = {"content": connect_new_account(token)}
         results = ConnectNewAccountSerializer(content).data
@@ -56,14 +66,12 @@ class ConnectNewAccountViewSet(viewsets.GenericViewSet):
 
 
 class SingleEmailViewSet(viewsets.GenericViewSet):
-    permissions_classes = [
-        permissions.IsAuthenticated,
-    ]
+    permissions_classes = [permissions.IsAuthenticated]
 
     serializer_class = SingleEmailSerializer
 
     def list(self, request):
-        token = request.META.get('HTTP_AUTHORIZATION')
+        token = request.META.get("HTTP_AUTHORIZATION")
         data = request.data
         address = data.get("address")
         email_id = data.get("email_id")
@@ -74,9 +82,7 @@ class SingleEmailViewSet(viewsets.GenericViewSet):
 
 
 class EmailDetailsViewSet(viewsets.GenericViewSet):
-    permissions_classes = [
-        permissions.IsAuthenticated,
-    ]
+    permissions_classes = [permissions.IsAuthenticated]
 
     serializer_class = EmailDetailsSerializer
 
@@ -91,21 +97,18 @@ class EmailDetailsViewSet(viewsets.GenericViewSet):
             token = headers.get("Authorization")
         except AttributeError:
             # auth is like this when request comes from postman
-            token = request.META.get('HTTP_AUTHORIZATION')
+            token = request.META.get("HTTP_AUTHORIZATION")
 
         n = data.get("n")
         before_time = data.get("before_time")
-        detailsList = {"detailsList": get_email_details(
-            n, before_time, token)}
+        detailsList = {"detailsList": get_email_details(n, before_time, token)}
 
         results = EmailDetailsSerializer(detailsList).data
         return Response(results)
 
 
 class EmailFromLabelViewSet(viewsets.GenericViewSet):
-    permissions_classes = [
-        permissions.IsAuthenticated,
-    ]
+    permissions_classes = [permissions.IsAuthenticated]
 
     serializer_class = EmailDetailsSerializer
 
@@ -121,18 +124,15 @@ class EmailFromLabelViewSet(viewsets.GenericViewSet):
             token = headers.get("Authorization")
         except AttributeError:
             # auth is like this when request comes from postman
-            token = request.META.get('HTTP_AUTHORIZATION')
+            token = request.META.get("HTTP_AUTHORIZATION")
 
-        detailsList = {
-            "detailsList": get_email_details_from_label(label, token)}
+        detailsList = {"detailsList": get_email_details_from_label(label, token)}
         results = EmailDetailsSerializer(detailsList).data
         return Response(results)
 
 
 class McwFromLabelViewSet(viewsets.GenericViewSet):
-    permissions_classes = [
-        permissions.IsAuthenticated,
-    ]
+    permissions_classes = [permissions.IsAuthenticated]
 
     serializer_class = McwFromLabelSerializer
 
@@ -145,7 +145,7 @@ class McwFromLabelViewSet(viewsets.GenericViewSet):
             token = headers.get("Authorization")
         except AttributeError:
             # auth is like this when request comes from postman
-            token = request.META.get('HTTP_AUTHORIZATION')
+            token = request.META.get("HTTP_AUTHORIZATION")
 
         mcw = {"mcw": mcw_from_label(label, token)}
         results = McwFromLabelSerializer(mcw).data
@@ -153,15 +153,13 @@ class McwFromLabelViewSet(viewsets.GenericViewSet):
 
 
 class ConnectedAddressesViewSet(viewsets.GenericViewSet):
-    permissions_classes = [
-        permissions.IsAuthenticated,
-    ]
+    permissions_classes = [permissions.IsAuthenticated]
 
     serializer_class = ConnectedAddressesSerializer
 
     def list(self, request):
         print(request.data)
-        token = request.META.get('HTTP_AUTHORIZATION')
+        token = request.META.get("HTTP_AUTHORIZATION")
         addresses = {"addresses": get_connected_addresses(token)}
         results = ConnectedAddressesSerializer(addresses).data
         return Response(results)

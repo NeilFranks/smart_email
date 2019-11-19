@@ -5,13 +5,13 @@ from .models import Category, ConnectedEmail
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ('__all__')
+        fields = "__all__"
 
 
 class ConnectNewEmailSerializer(serializers.ModelSerializer):
     class Meta:
         model = ConnectedEmail
-        fields = ('__all__')
+        fields = "__all__"
 
 
 class ConnectNewAccountSerializer(serializers.Serializer):
