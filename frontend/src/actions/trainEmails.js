@@ -11,6 +11,7 @@ export const addTrainEmails = email => dispatch => {
   dispatch({
     type: ADD_TRAINEMAILS,
     payload: {
+      address: email.emailDetails.address,
       id: email.emailDetails.id,
       sender: email.emailDetails.sender,
       subject: email.emailDetails.subject,

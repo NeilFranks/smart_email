@@ -28,6 +28,8 @@ from .serializers import (
 )
 from .learn import mcw_from_label
 
+import json
+
 
 class CategoryViewSet(viewsets.ModelViewSet):
     permissions_classes = [permissions.IsAuthenticated]
@@ -331,16 +333,13 @@ class BatchUnmarkFromSomethingViewSet(viewsets.GenericViewSet):
 class CreateLabelViewSet(viewsets.GenericViewSet):
     permissions_classes = [permissions.IsAuthenticated]
 
-    print("In ViewSet")
-
     def list(self, request):
         pass
 
     def post(self, request):
-        print("In Post")
         data = request.data
-        address = data.get("address")
-        label = data.get("label_object")
+        label = data.get("label")
+        emails = data.get("emails")
         try:
             data = request.data
             # auth is in headers like this when request comes from front end
@@ -350,4 +349,23 @@ class CreateLabelViewSet(viewsets.GenericViewSet):
             # auth is like this when request comes from postman
             token = request.META.get("HTTP_AUTHORIZATION")
 
-        create_label(address, label, token)
+        # create the label in GMail world
+        create_label(label, token)
+
+        # TODO: some way to check create_label() called through to GMail successfully?
+
+        # move emails into label
+        addressDict = dict()
+        for email in emails:
+            address = email.get("address")
+            if address in addressDict:
+                addressDict[address].append(email.get("id"))
+            else:
+                addressDict[address] = [email.get("id")]
+
+        # batch_mark_as_something(addressDict, [label], token)
+
+        # train a model
+
+        return Response(data=label, status=200)
+

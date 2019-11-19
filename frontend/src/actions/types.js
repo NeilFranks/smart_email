@@ -25,3 +25,4 @@ export const UNHIDE_EMAIL = "UNHIDE_EMAIL";
 export const GET_TRAINIDS = "GET_TRAINIDS";
 export const ADD_TRAINIDS = "ADD_TRAINIDS";
 export const REMOVE_TRAINIDS = "REMOVE_TRAINIDS";
+export const CREATE_LABEL = "CREATE_LABEL";

@@ -417,13 +417,15 @@ def get_email_details_from_account(connectionAndN):
     return detailsList
 
 
-def create_label(account, label_object, app_token):
+def create_label(label_object, app_token):
     connections = retrieve_accounts(app_token)
     for connection in connections:
-        if account == connection.get("address"):
-            creds = connection.get("creds")
-            service = build("gmail", "v1", credentials=creds)
-            label = service.users().labels().create(userId=account, body=label_object)
+        creds = connection.get("creds")
+        service = build("gmail", "v1", credentials=creds)
+        label = (
+            service.users().labels().create(userId="me", body=label_object).execute()
+        )
+        print(label["id"])
 
 
 def batch_unmark_from_something(account, list_of_ids, list_of_labels, app_token):
@@ -443,21 +445,26 @@ def batch_unmark_from_something(account, list_of_ids, list_of_labels, app_token)
             )
 
 
-def batch_mark_as_something(account, list_of_ids, list_of_labels, app_token):
-    connections = retrieve_accounts(app_token)
-    for connection in connections:
-        if account == connection.get("address"):
-            creds = connection.get("creds")
-            service = build("gmail", "v1", credentials=creds)
-            messages = (
-                service.users()
-                .messages()
-                .batchModify(
-                    userId="me",
-                    body={"ids": list_of_ids, "addLabelIds": list_of_labels},
+def batch_mark_as_something(addressDict, list_of_labels, app_token):
+    for address in addressDict:
+        list_of_ids = addressDict[address]
+        connections = retrieve_accounts(app_token)
+        for connection in connections:
+            if address == connection.get("address"):
+                print("doing it big time to %s" % list_of_labels)
+                print("with %s" % list_of_ids)
+                print("for %s" % address)
+                creds = connection.get("creds")
+                service = build("gmail", "v1", credentials=creds)
+                messages = (
+                    service.users()
+                    .messages()
+                    .batchModify(
+                        userId="me",
+                        body={"ids": list_of_ids, "addLabelIds": list_of_labels},
+                    )
+                    .execute()
                 )
-                .execute()
-            )
 
 
 def single_mark_as_read(account, message_id, app_token):

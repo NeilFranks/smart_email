@@ -2,6 +2,7 @@ import React, { Component, Fragment } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import { getTrainIds } from "../../actions/trainEmails";
+import { createLabel } from "../../actions/gmail";
 
 export class TrainHeader extends Component {
   state = {
@@ -10,14 +11,16 @@ export class TrainHeader extends Component {
 
   static propTypes = {
     // trainModel: PropTypes.func.isRequired,
-    trainIds: PropTypes.array.isRequired
+    trainIds: PropTypes.array.isRequired,
+    trainEmails: PropTypes.array.isRequired,
+    createLabel: PropTypes.func.isRequired
   };
 
   onChange = e => this.setState({ [e.target.name]: e.target.value });
 
   onSubmit = e => {
     e.preventDefault();
-    // this.props.trainModel(category);
+    this.props.createLabel(this.state.category, this.props.trainEmails);
   };
 
   render() {
@@ -95,7 +98,10 @@ const arraySize = arr => {
 };
 
 const mapStateToProps = state => ({
-  trainIds: state.trainIds.trainIds
+  trainIds: state.trainIds.trainIds,
+  trainEmails: state.trainEmails.trainEmails
 });
 
-export default connect(mapStateToProps, { getTrainIds })(TrainHeader);
+export default connect(mapStateToProps, { getTrainIds, createLabel })(
+  TrainHeader
+);
