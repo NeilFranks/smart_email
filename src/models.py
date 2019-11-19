@@ -6,4 +6,5 @@ class ConnectedEmail(models.Model):
     creds = models.TextField()
     address = models.TextField()
     owner = models.ForeignKey(
-        User, related_name="connectedEmail", on_delete=models.CASCADE, null=True)
+        User, related_name="connectedEmail", on_delete=models.CASCADE, null=True
+    )

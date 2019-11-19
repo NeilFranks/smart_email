@@ -5,7 +5,7 @@ from .models import ConnectedEmail
 class ConnectNewEmailSerializer(serializers.ModelSerializer):
     class Meta:
         model = ConnectedEmail
-        fields = ('__all__')
+        fields = "__all__"
 
 
 class ConnectNewAccountSerializer(serializers.Serializer):
