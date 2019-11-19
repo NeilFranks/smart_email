@@ -5,6 +5,14 @@ from .gmail import (
     get_connected_addresses,
     get_emails_from_label,
     get_email_details_from_label,
+    single_mark_as_read,
+    single_mark_as_unread,
+    batch_mark_as_read,
+    batch_mark_as_unread,
+    trash_message,
+    batch_mark_as_something,
+    batch_unmark_from_something,
+    create_label,
 )
 from rest_framework.response import Response
 from rest_framework import viewsets, permissions
@@ -158,8 +166,188 @@ class ConnectedAddressesViewSet(viewsets.GenericViewSet):
     serializer_class = ConnectedAddressesSerializer
 
     def list(self, request):
-        print(request.data)
         token = request.META.get("HTTP_AUTHORIZATION")
         addresses = {"addresses": get_connected_addresses(token)}
         results = ConnectedAddressesSerializer(addresses).data
         return Response(results)
+
+
+class SingleMarkAsReadViewSet(viewsets.GenericViewSet):
+    permissions_classes = [permissions.IsAuthenticated]
+
+    def list(self, request):
+        pass
+
+    def post(self, request):
+        data = request.data
+        address = data.get("address")
+        messageId = data.get("message_id")
+        try:
+            data = request.data
+            # auth is in headers like this when request comes from front end
+            headers = data.get("headers")
+            token = headers.get("Authorization")
+        except AttributeError:
+            # auth is like this when request comes from postman
+            token = request.META.get("HTTP_AUTHORIZATION")
+
+        single_mark_as_read(address, messageId, token)
+
+
+class SingleMarkAsUnreadViewSet(viewsets.GenericViewSet):
+    permissions_classes = [permissions.IsAuthenticated]
+
+    def list(self, request):
+        pass
+
+    def post(self, request):
+        data = request.data
+        address = data.get("address")
+        messageId = data.get("message_id")
+        try:
+            data = request.data
+            # auth is in headers like this when request comes from front end
+            headers = data.get("headers")
+            token = headers.get("Authorization")
+        except AttributeError:
+            # auth is like this when request comes from postman
+            token = request.META.get("HTTP_AUTHORIZATION")
+
+        single_mark_as_unread(address, messageId, token)
+
+
+class BatchMarkAsReadViewSet(viewsets.GenericViewSet):
+    permissions_classes = [permissions.IsAuthenticated]
+
+    def list(self, request):
+        pass
+
+    def post(self, request):
+        data = request.data
+        address = data.get("address")
+        messageId = data.get("message_id")
+        try:
+            data = request.data
+            # auth is in headers like this when request comes from front end
+            headers = data.get("headers")
+            token = headers.get("Authorization")
+        except AttributeError:
+            # auth is like this when request comes from postman
+            token = request.META.get("HTTP_AUTHORIZATION")
+
+        batch_mark_as_read(address, messageId, token)
+
+
+class BatchMarkAsUnreadViewSet(viewsets.GenericViewSet):
+    permissions_classes = [permissions.IsAuthenticated]
+
+    def list(self, request):
+        pass
+
+    def post(self, request):
+        data = request.data
+        address = data.get("address")
+        messageId = data.get("message_id")
+        try:
+            data = request.data
+            # auth is in headers like this when request comes from front end
+            headers = data.get("headers")
+            token = headers.get("Authorization")
+        except AttributeError:
+            # auth is like this when request comes from postman
+            token = request.META.get("HTTP_AUTHORIZATION")
+
+        batch_mark_as_unread(address, messageId, token)
+
+
+class TrashViewSet(viewsets.GenericViewSet):
+    permissions_classes = [permissions.IsAuthenticated]
+
+    def list(self, request):
+        pass
+
+    def post(self, request):
+        data = request.data
+        address = data.get("address")
+        messageId = data.get("message_id")
+        try:
+            data = request.data
+            # auth is in headers like this when request comes from front end
+            headers = data.get("headers")
+            token = headers.get("Authorization")
+        except AttributeError:
+            # auth is like this when request comes from postman
+            token = request.META.get("HTTP_AUTHORIZATION")
+
+        trash_message(address, messageId, token)
+
+
+class BatchMarkAsSomethingViewSet(viewsets.GenericViewSet):
+    permissions_classes = [permissions.IsAuthenticated]
+
+    def list(self, request):
+        pass
+
+    def post(self, request):
+        data = request.data
+        address = data.get("address")
+        messageIds = data.get("list_of_ids")
+        labelList = data.get("list_of_labels")
+        try:
+            data = request.data
+            # auth is in headers like this when request comes from front end
+            headers = data.get("headers")
+            token = headers.get("Authorization")
+        except AttributeError:
+            # auth is like this when request comes from postman
+            token = request.META.get("HTTP_AUTHORIZATION")
+
+        batch_mark_as_something(address, messageIds, labelList, token)
+
+
+class BatchUnmarkFromSomethingViewSet(viewsets.GenericViewSet):
+    permissions_classes = [permissions.IsAuthenticated]
+
+    def list(self, request):
+        pass
+
+    def post(self, request):
+        data = request.data
+        address = data.get("address")
+        messageIds = data.get("list_of_ids")
+        labelList = data.get("list_of_labels")
+        try:
+            data = request.data
+            # auth is in headers like this when request comes from front end
+            headers = data.get("headers")
+            token = headers.get("Authorization")
+        except AttributeError:
+            # auth is like this when request comes from postman
+            token = request.META.get("HTTP_AUTHORIZATION")
+
+        batch_unmark_from_something(address, messageIds, labelList, token)
+
+
+class CreateLabelViewSet(viewsets.GenericViewSet):
+    permissions_classes = [permissions.IsAuthenticated]
+
+    print("In ViewSet")
+
+    def list(self, request):
+        pass
+
+    def post(self, request):
+        print("In Post")
+        data = request.data
+        address = data.get("address")
+        label = data.get("label_object")
+        try:
+            data = request.data
+            # auth is in headers like this when request comes from front end
+            headers = data.get("headers")
+            token = headers.get("Authorization")
+        except AttributeError:
+            # auth is like this when request comes from postman
+            token = request.META.get("HTTP_AUTHORIZATION")
+
+        create_label(address, label, token)

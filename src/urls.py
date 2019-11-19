@@ -8,6 +8,14 @@ from .api import (
     ConnectedAddressesViewSet,
     EmailFromLabelViewSet,
     McwFromLabelViewSet,
+    SingleMarkAsReadViewSet,
+    SingleMarkAsUnreadViewSet,
+    BatchMarkAsReadViewSet,
+    BatchMarkAsUnreadViewSet,
+    TrashViewSet,
+    BatchMarkAsSomethingViewSet,
+    BatchUnmarkFromSomethingViewSet,
+    CreateLabelViewSet,
 )
 
 # from django.conf.urls import url
@@ -23,5 +31,25 @@ router.register("api/emailFromLabel", EmailFromLabelViewSet, "emailFromLabel")
 router.register("api/et", ConnectedEmailViewSet, "et")
 router.register("api/mostCommon", McwFromLabelViewSet, "mostCommon")
 router.register("api/singleEmail", SingleEmailViewSet, "singleEmail")
+router.register("api/connectNewEmail", ConnectNewAccountViewSet, "connectNewEmail")
+router.register(
+    "api/connectedAddresses", ConnectedAddressesViewSet, "connectedAddresses"
+)
+router.register("api/singleMarkAsRead", SingleMarkAsReadViewSet, "singleMarkAsRead")
+router.register(
+    "api/singleMarkAsUnread", SingleMarkAsUnreadViewSet, "singleMarkAsUnread"
+)
+router.register("api/batchMarkAsRead", BatchMarkAsReadViewSet, "batchMarkAsRead")
+router.register("api/batchMarkAsUnread", BatchMarkAsUnreadViewSet, "batchMarkAsUnread")
+router.register("api/trashMessage", TrashViewSet, "trashMessage")
+router.register(
+    "api/batchMarkAsSomething", BatchMarkAsSomethingViewSet, "batchMarkAsSomething"
+)
+router.register(
+    "api/batchUnmarkFromSomething",
+    BatchUnmarkFromSomethingViewSet,
+    "batchUnmarkFromSomething",
+)
+router.register("api/createLabel", CreateLabelViewSet, "createLabel")
 
 urlpatterns = router.urls
