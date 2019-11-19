@@ -8,6 +8,7 @@ import quopri
 import re
 import dateutil.parser
 import multiprocessing as mp
+import googleapiclient
 
 # If modifying these scopes, delete the stored token.
 SCOPES = ["https://mail.google.com/"]
@@ -422,10 +423,17 @@ def create_label(label_object, app_token):
     for connection in connections:
         creds = connection.get("creds")
         service = build("gmail", "v1", credentials=creds)
-        label = (
-            service.users().labels().create(userId="me", body=label_object).execute()
-        )
-        print(label["id"])
+        try:
+            label = (
+                service.users()
+                .labels()
+                .create(userId="me", body=label_object)
+                .execute()
+            )
+            print(label)
+        except googleapiclient.errors.HttpError as e:
+            print(e)
+            return e.resp
 
 
 def batch_unmark_from_something(account, list_of_ids, list_of_labels, app_token):

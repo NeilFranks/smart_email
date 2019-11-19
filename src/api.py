@@ -29,6 +29,7 @@ from .serializers import (
 from .learn import mcw_from_label
 
 import json
+import requests
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -350,9 +351,17 @@ class CreateLabelViewSet(viewsets.GenericViewSet):
             token = request.META.get("HTTP_AUTHORIZATION")
 
         # create the label in GMail world
-        create_label(label, token)
-
-        # TODO: some way to check create_label() called through to GMail successfully?
+        label_object = {
+            "messageListVisibility": "show",
+            "name": label,
+            "labelListVisibility": "labelShow",
+        }
+        print(requests.codes.ok)
+        create_label_response = create_label(label_object, token)
+        if create_label_response and create_label_response.status != requests.codes.ok:
+            return Response(
+                data=create_label_response, status=create_label_response.status
+            )
 
         # move emails into label
         addressDict = dict()
@@ -363,7 +372,7 @@ class CreateLabelViewSet(viewsets.GenericViewSet):
             else:
                 addressDict[address] = [email.get("id")]
 
-        # batch_mark_as_something(addressDict, [label], token)
+        batch_mark_as_something(addressDict, [label], token)
 
         # train a model
 
