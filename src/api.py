@@ -1,13 +1,30 @@
-from .gmail import connect_new_account, get_single_email, get_email_details, get_connected_addresses, single_mark_as_read, single_mark_as_unread, batch_mark_as_read, batch_mark_as_unread, trash_message, batch_mark_as_something, batch_unmark_from_something, create_label
+from .gmail import (
+    connect_new_account,
+    get_single_email,
+    get_email_details,
+    get_connected_addresses,
+    single_mark_as_read,
+    single_mark_as_unread,
+    batch_mark_as_read,
+    batch_mark_as_unread,
+    trash_message,
+    batch_mark_as_something,
+    batch_unmark_from_something,
+    create_label,
+)
 from rest_framework.response import Response
 from rest_framework import viewsets, permissions
-from .serializers import ConnectNewEmailSerializer, ConnectNewAccountSerializer, SingleEmailSerializer, EmailDetailsSerializer, ConnectedAddressesSerializer
+from .serializers import (
+    ConnectNewEmailSerializer,
+    ConnectNewAccountSerializer,
+    SingleEmailSerializer,
+    EmailDetailsSerializer,
+    ConnectedAddressesSerializer,
+)
 
 
 class ConnectedEmailViewSet(viewsets.ModelViewSet):
-    permissions_classes = [
-        permissions.IsAuthenticated,
-    ]
+    permissions_classes = [permissions.IsAuthenticated]
 
     serializer_class = ConnectNewEmailSerializer
 
@@ -19,9 +36,7 @@ class ConnectedEmailViewSet(viewsets.ModelViewSet):
 
 
 class ConnectNewAccountViewSet(viewsets.GenericViewSet):
-    permissions_classes = [
-        permissions.IsAuthenticated,
-    ]
+    permissions_classes = [permissions.IsAuthenticated]
 
     serializer_class = ConnectNewAccountSerializer
 
@@ -33,7 +48,7 @@ class ConnectNewAccountViewSet(viewsets.GenericViewSet):
             token = headers.get("Authorization")
         except AttributeError:
             # auth is like this when request comes from postman
-            token = request.META.get('HTTP_AUTHORIZATION')
+            token = request.META.get("HTTP_AUTHORIZATION")
 
         print("token: %s" % token)
         content = {"content": connect_new_account(token)}
@@ -47,14 +62,12 @@ class ConnectNewAccountViewSet(viewsets.GenericViewSet):
 
 
 class SingleEmailViewSet(viewsets.GenericViewSet):
-    permissions_classes = [
-        permissions.IsAuthenticated,
-    ]
+    permissions_classes = [permissions.IsAuthenticated]
 
     serializer_class = SingleEmailSerializer
 
     def list(self, request):
-        token = request.META.get('HTTP_AUTHORIZATION')
+        token = request.META.get("HTTP_AUTHORIZATION")
         data = request.data
         address = data.get("address")
         email_id = data.get("email_id")
@@ -65,9 +78,7 @@ class SingleEmailViewSet(viewsets.GenericViewSet):
 
 
 class EmailDetailsViewSet(viewsets.GenericViewSet):
-    permissions_classes = [
-        permissions.IsAuthenticated,
-    ]
+    permissions_classes = [permissions.IsAuthenticated]
 
     serializer_class = EmailDetailsSerializer
 
@@ -83,7 +94,7 @@ class EmailDetailsViewSet(viewsets.GenericViewSet):
             token = headers.get("Authorization")
         except AttributeError:
             # auth is like this when request comes from postman
-            token = request.META.get('HTTP_AUTHORIZATION')
+            token = request.META.get("HTTP_AUTHORIZATION")
 
         detailsList = {"detailsList": get_email_details(n, token)}
         results = EmailDetailsSerializer(detailsList).data
@@ -91,22 +102,19 @@ class EmailDetailsViewSet(viewsets.GenericViewSet):
 
 
 class ConnectedAddressesViewSet(viewsets.GenericViewSet):
-    permissions_classes = [
-        permissions.IsAuthenticated,
-    ]
+    permissions_classes = [permissions.IsAuthenticated]
 
     serializer_class = ConnectedAddressesSerializer
 
     def list(self, request):
-        token = request.META.get('HTTP_AUTHORIZATION')
+        token = request.META.get("HTTP_AUTHORIZATION")
         addresses = {"addresses": get_connected_addresses(token)}
         results = ConnectedAddressesSerializer(addresses).data
         return Response(results)
 
+
 class SingleMarkAsReadViewSet(viewsets.GenericViewSet):
-    permissions_classes = [
-        permissions.IsAuthenticated,
-    ]
+    permissions_classes = [permissions.IsAuthenticated]
 
     def list(self, request):
         pass
@@ -122,16 +130,13 @@ class SingleMarkAsReadViewSet(viewsets.GenericViewSet):
             token = headers.get("Authorization")
         except AttributeError:
             # auth is like this when request comes from postman
-            token = request.META.get('HTTP_AUTHORIZATION')
+            token = request.META.get("HTTP_AUTHORIZATION")
 
-        print("token: %s" % token)
-        # content = {"content": connect_new_account(token)}
-        message = {"message": single_mark_as_read(address, messageId, token)}
+        single_mark_as_read(address, messageId, token)
+
 
 class SingleMarkAsUnreadViewSet(viewsets.GenericViewSet):
-    permissions_classes = [
-        permissions.IsAuthenticated,
-    ]
+    permissions_classes = [permissions.IsAuthenticated]
 
     def list(self, request):
         pass
@@ -147,16 +152,13 @@ class SingleMarkAsUnreadViewSet(viewsets.GenericViewSet):
             token = headers.get("Authorization")
         except AttributeError:
             # auth is like this when request comes from postman
-            token = request.META.get('HTTP_AUTHORIZATION')
+            token = request.META.get("HTTP_AUTHORIZATION")
 
-        print("token: %s" % token)
-        # content = {"content": connect_new_account(token)}
-        message = {"message": single_mark_as_unread(address, messageId, token)}
+        single_mark_as_unread(address, messageId, token)
+
 
 class BatchMarkAsReadViewSet(viewsets.GenericViewSet):
-    permissions_classes = [
-        permissions.IsAuthenticated,
-    ]
+    permissions_classes = [permissions.IsAuthenticated]
 
     def list(self, request):
         pass
@@ -172,16 +174,13 @@ class BatchMarkAsReadViewSet(viewsets.GenericViewSet):
             token = headers.get("Authorization")
         except AttributeError:
             # auth is like this when request comes from postman
-            token = request.META.get('HTTP_AUTHORIZATION')
+            token = request.META.get("HTTP_AUTHORIZATION")
 
-        print("token: %s" % token)
-        # content = {"content": connect_new_account(token)}
-        message = {"message": batch_mark_as_read(address, messageId, token)}
+        batch_mark_as_read(address, messageId, token)
+
 
 class BatchMarkAsUnreadViewSet(viewsets.GenericViewSet):
-    permissions_classes = [
-        permissions.IsAuthenticated,
-    ]
+    permissions_classes = [permissions.IsAuthenticated]
 
     def list(self, request):
         pass
@@ -197,16 +196,13 @@ class BatchMarkAsUnreadViewSet(viewsets.GenericViewSet):
             token = headers.get("Authorization")
         except AttributeError:
             # auth is like this when request comes from postman
-            token = request.META.get('HTTP_AUTHORIZATION')
+            token = request.META.get("HTTP_AUTHORIZATION")
 
-        print("token: %s" % token)
-        # content = {"content": connect_new_account(token)}
-        message = {"message": batch_mark_as_unread(address, messageId, token)}
+        batch_mark_as_unread(address, messageId, token)
+
 
 class TrashViewSet(viewsets.GenericViewSet):
-    permissions_classes = [
-        permissions.IsAuthenticated,
-    ]
+    permissions_classes = [permissions.IsAuthenticated]
 
     def list(self, request):
         pass
@@ -222,16 +218,13 @@ class TrashViewSet(viewsets.GenericViewSet):
             token = headers.get("Authorization")
         except AttributeError:
             # auth is like this when request comes from postman
-            token = request.META.get('HTTP_AUTHORIZATION')
+            token = request.META.get("HTTP_AUTHORIZATION")
 
-        print("token: %s" % token)
-        # content = {"content": connect_new_account(token)}
-        message = {"message": trash_message(address, messageId, token)}
+        trash_message(address, messageId, token)
+
 
 class BatchMarkAsSomethingViewSet(viewsets.GenericViewSet):
-    permissions_classes = [
-        permissions.IsAuthenticated,
-    ]
+    permissions_classes = [permissions.IsAuthenticated]
 
     def list(self, request):
         pass
@@ -248,16 +241,13 @@ class BatchMarkAsSomethingViewSet(viewsets.GenericViewSet):
             token = headers.get("Authorization")
         except AttributeError:
             # auth is like this when request comes from postman
-            token = request.META.get('HTTP_AUTHORIZATION')
+            token = request.META.get("HTTP_AUTHORIZATION")
 
-        print("token: %s" % token)
-        # content = {"content": connect_new_account(token)}
-        message = {"message": batch_mark_as_something(address, messageIds, labelList, token)}
+        batch_mark_as_something(address, messageIds, labelList, token)
+
 
 class BatchUnmarkFromSomethingViewSet(viewsets.GenericViewSet):
-    permissions_classes = [
-        permissions.IsAuthenticated,
-    ]
+    permissions_classes = [permissions.IsAuthenticated]
 
     def list(self, request):
         pass
@@ -274,16 +264,13 @@ class BatchUnmarkFromSomethingViewSet(viewsets.GenericViewSet):
             token = headers.get("Authorization")
         except AttributeError:
             # auth is like this when request comes from postman
-            token = request.META.get('HTTP_AUTHORIZATION')
+            token = request.META.get("HTTP_AUTHORIZATION")
 
-        print("token: %s" % token)
-        # content = {"content": connect_new_account(token)}
-        message = {"message": batch_unmark_from_something(address, messageIds, labelList, token)}
+        batch_unmark_from_something(address, messageIds, labelList, token)
+
 
 class CreateLabelViewSet(viewsets.GenericViewSet):
-    permissions_classes = [
-        permissions.IsAuthenticated,
-    ]
+    permissions_classes = [permissions.IsAuthenticated]
 
     print("In ViewSet")
 
@@ -302,9 +289,6 @@ class CreateLabelViewSet(viewsets.GenericViewSet):
             token = headers.get("Authorization")
         except AttributeError:
             # auth is like this when request comes from postman
-            token = request.META.get('HTTP_AUTHORIZATION')
+            token = request.META.get("HTTP_AUTHORIZATION")
 
-        print("token: %s" % token)
-        # content = {"content": connect_new_account(token)}
-        message = {"label": create_label(address, label, token)}
-        print("create_label() finished")
+        create_label(address, label, token)

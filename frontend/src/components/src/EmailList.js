@@ -126,7 +126,4 @@ const snippetPrepend = snippet => {
   return " - ".concat(snippet);
 };
 
-export default connect(
-  mapStateToProps,
-  { getEmailDetails }
-)(EmailList);
+export default connect(mapStateToProps, { getEmailDetails })(EmailList);
