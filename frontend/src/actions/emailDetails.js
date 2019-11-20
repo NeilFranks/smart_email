@@ -9,13 +9,24 @@ import {
   SET_SELECTEDLABEL
 } from "./types";
 
-export const getEmailDetails = (before_time, label_id) => (
+export const getEmailDetails = (before_time, category) => (
   dispatch,
   getState
 ) => {
+  // if a before_time was not specified, make it the current time
   if (before_time == null) {
     before_time = Math.floor(Date.now() / 1000);
   }
+
+  // if a category was specified, extract the values from it
+  var label_id = null;
+  var label_name = null;
+  if (category != null) {
+    label_id = category.label_id;
+    label_name = category.name;
+  }
+
+  //get the emails from any specified category, before the specified time
   axios
     .post("/api/emailDetails/", tokenConfig(getState), {
       data: {
@@ -25,10 +36,13 @@ export const getEmailDetails = (before_time, label_id) => (
       }
     })
     .then(res => {
+      // set the label you selected
       dispatch({
         type: SET_SELECTEDLABEL,
-        payload: label_id
+        payload: label_name
       });
+
+      //return the list of emails obtained
       dispatch({
         type: GET_EMAILDETAILS,
         payload: res.data.detailsList

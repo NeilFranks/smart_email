@@ -120,7 +120,10 @@ class EmailDetailsViewSet(viewsets.GenericViewSet):
         n = data.get("n")
         before_time = data.get("before_time")
         encoded_label_id = data.get("label_id")
-        label_id = pickle.loads(codecs.decode(encoded_label_id.encode(), "base64"))
+        if encoded_label_id:
+            label_id = pickle.loads(codecs.decode(encoded_label_id.encode(), "base64"))
+        else:
+            label_id = None
 
         detailsList = {
             "detailsList": get_email_details(n, before_time, label_id, token)
