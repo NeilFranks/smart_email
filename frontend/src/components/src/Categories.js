@@ -16,7 +16,7 @@ export class Categories extends Component {
     deleteCategory: PropTypes.func.isRequired,
     emailDetails: PropTypes.array.isRequired,
     getEmailDetails: PropTypes.func.isRequired,
-    selectedLabel: PropTypes.string
+    selectedLabel: PropTypes.object
   };
 
   componentDidMount() {
@@ -53,7 +53,8 @@ export class Categories extends Component {
             </thead>
             <tbody>
               {this.props.categories.map(category =>
-                this.props.selectedLabel == category.name ? (
+                this.props.selectedLabel != null &&
+                this.props.selectedLabel.name == category.name ? (
                   <tr
                     key={category.id}
                     onClick={() => this.getEmailsFromLabel(category)}

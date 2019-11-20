@@ -20,10 +20,8 @@ export const getEmailDetails = (before_time, category) => (
 
   // if a category was specified, extract the values from it
   var label_id = null;
-  var label_name = null;
   if (category != null) {
     label_id = category.label_id;
-    label_name = category.name;
   }
 
   //get the emails from any specified category, before the specified time
@@ -39,7 +37,7 @@ export const getEmailDetails = (before_time, category) => (
       // set the label you selected
       dispatch({
         type: SET_SELECTEDLABEL,
-        payload: label_name
+        payload: category
       });
 
       //return the list of emails obtained

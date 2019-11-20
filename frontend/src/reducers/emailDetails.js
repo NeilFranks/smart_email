@@ -7,7 +7,7 @@ import {
 } from "../actions/types.js";
 
 const initialState = {
-  selectedLabel: "",
+  selectedLabel: null,
   emailDetails: [],
   connectedAccounts: []
 };

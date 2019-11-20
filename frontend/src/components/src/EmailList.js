@@ -9,7 +9,7 @@ export class EmailList extends Component {
   static propTypes = {
     emailDetails: PropTypes.array.isRequired,
     getEmailDetails: PropTypes.func.isRequired,
-    selectedLabel: PropTypes.string
+    selectedLabel: PropTypes.object
   };
 
   componentDidMount() {
