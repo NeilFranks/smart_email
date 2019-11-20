@@ -39,7 +39,7 @@ export class Categories extends Component {
             <tbody>
               {this.props.selectedLabel == null ? (
                 <tr onClick={() => this.getEmailsFromLabel()} bgcolor="#eee">
-                  <th>All Categories</th>
+                  <th>All</th>
                   {/* for deletion: */}
                   <th />
                 </tr>
