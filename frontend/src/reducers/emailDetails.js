@@ -30,7 +30,8 @@ export default function(state = initialState, action) {
     case SET_SELECTEDLABEL:
       return {
         ...state,
-        selectedLabel: action.payload
+        selectedLabel: action.payload,
+        emailDetails: []
       };
     case GET_CONNECTEDACCOUNTS:
       return {

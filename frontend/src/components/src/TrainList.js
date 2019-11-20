@@ -13,47 +13,26 @@ export class TrainList extends Component {
   render() {
     return (
       <Fragment>
-        <table className="table">
+        <table className="table table-hover">
           <tbody>
             {this.props.trainEmails.map(trainEmails => (
               <tr key={trainEmails.id} bgcolor="#fff">
                 <td
                   style={{
                     border: "none",
+                    fontSize: "small",
                     width: "90%",
                     maxWidth: 0
                   }}
                 >
-                  <table className="table">
-                    <tbody>
-                      <tr
-                        style={{
-                          fontSize: "small"
-                        }}
-                      >
-                        <td>
-                          <strong>{trainEmails.sender}</strong>
-                        </td>
-                      </tr>
-                      <tr
-                        style={{
-                          fontSize: "small"
-                        }}
-                      >
-                        <td style={{ wordBreak: "break-word" }}>
-                          <strong>{trainEmails.subject}</strong>
-                          {snippetPrepend(trainEmails.snippet)}
-                        </td>
-                      </tr>
-                      <tr
-                        style={{
-                          fontSize: "small"
-                        }}
-                      >
-                        <td>{dateString(new Date(trainEmails.date))}</td>
-                      </tr>
-                    </tbody>
-                  </table>
+                  <div>
+                    <strong>{trainEmails.sender}</strong>
+                  </div>
+                  <div style={{ wordBreak: "break-word" }}>
+                    <strong>{trainEmails.subject}</strong>
+                    {snippetPrepend(trainEmails.snippet)}
+                  </div>
+                  <div>{dateString(new Date(trainEmails.date))}</div>
                 </td>
                 <td
                   style={{

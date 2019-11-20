@@ -13,6 +13,12 @@ export const getEmailDetails = (before_time, category) => (
   dispatch,
   getState
 ) => {
+  // set the label you selected
+  dispatch({
+    type: SET_SELECTEDLABEL,
+    payload: category
+  });
+
   // if a before_time was not specified, make it the current time
   if (before_time == null) {
     before_time = Math.floor(Date.now() / 1000);
@@ -34,12 +40,6 @@ export const getEmailDetails = (before_time, category) => (
       }
     })
     .then(res => {
-      // set the label you selected
-      dispatch({
-        type: SET_SELECTEDLABEL,
-        payload: category
-      });
-
       //return the list of emails obtained
       dispatch({
         type: GET_EMAILDETAILS,

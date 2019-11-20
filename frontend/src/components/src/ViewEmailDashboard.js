@@ -9,7 +9,7 @@ export default function ViewEmailDashboard() {
         <div style={{ float: "left", width: "200px" }}>
           <Categories />
         </div>
-        <div style={{ overflow: "hidden" }}>
+        <div style={{ overflow: "hidden", paddingLeft: "5px" }}>
           <EmailList />
         </div>
       </div>

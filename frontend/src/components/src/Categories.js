@@ -35,7 +35,7 @@ export class Categories extends Component {
     return (
       <div>
         <Fragment>
-          <table className="table">
+          <table className="table table-hover">
             <thead>
               {this.props.selectedLabel == null ? (
                 <tr onClick={() => this.getEmailsFromLabel()} bgcolor="#eee">
@@ -81,7 +81,11 @@ export class Categories extends Component {
                     key={category.id}
                     onClick={() => this.getEmailsFromLabel(category)}
                   >
-                    <td>{category.name}</td>
+                    {this.highlight ? (
+                      <td bgcolor="#f00">{category.name}</td>
+                    ) : (
+                      <td>{category.name}</td>
+                    )}
                     <td>
                       <button
                         onClick={this.props.deleteCategory.bind(

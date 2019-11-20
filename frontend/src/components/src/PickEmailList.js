@@ -20,7 +20,7 @@ export class PickEmailList extends Component {
   render() {
     return (
       <Fragment>
-        <table className="table">
+        <table className="table table-hover">
           <tbody>
             {this.props.emailDetails.map(emailDetails =>
               !containsObject(emailDetails.id, this.props.trainIds) ? (
@@ -28,40 +28,19 @@ export class PickEmailList extends Component {
                   <td
                     style={{
                       border: "none",
+                      fontSize: "small",
                       width: "90%",
                       maxWidth: 0
                     }}
                   >
-                    <table className="table">
-                      <tbody>
-                        <tr
-                          style={{
-                            fontSize: "small"
-                          }}
-                        >
-                          <td>
-                            <strong>{emailDetails.sender}</strong>
-                          </td>
-                        </tr>
-                        <tr
-                          style={{
-                            fontSize: "small"
-                          }}
-                        >
-                          <td style={{ wordBreak: "break-word" }}>
-                            <strong>{emailDetails.subject}</strong>
-                            {snippetPrepend(emailDetails.snippet)}
-                          </td>
-                        </tr>
-                        <tr
-                          style={{
-                            fontSize: "small"
-                          }}
-                        >
-                          <td>{dateString(new Date(emailDetails.date))}</td>
-                        </tr>
-                      </tbody>
-                    </table>
+                    <div>
+                      <strong>{emailDetails.sender}</strong>
+                    </div>
+                    <div style={{ wordBreak: "break-word" }}>
+                      <strong>{emailDetails.subject}</strong>
+                      {snippetPrepend(emailDetails.snippet)}
+                    </div>
+                    <div>{dateString(new Date(emailDetails.date))}</div>
                   </td>
                   <td
                     style={{
