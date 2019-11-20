@@ -36,7 +36,7 @@ export class Categories extends Component {
       <div>
         <Fragment>
           <table className="table table-hover">
-            <thead>
+            <tbody>
               {this.props.selectedLabel == null ? (
                 <tr onClick={() => this.getEmailsFromLabel()} bgcolor="#eee">
                   <th>All Categories</th>
@@ -50,8 +50,6 @@ export class Categories extends Component {
                   <th />
                 </tr>
               )}
-            </thead>
-            <tbody>
               {this.props.categories.map(category =>
                 this.props.selectedLabel != null &&
                 this.props.selectedLabel.name == category.name ? (
