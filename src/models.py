@@ -6,6 +6,7 @@ class Category(models.Model):
     name = models.TextField()
     label_id = models.TextField()
     classifier = models.TextField()
+    mcw = models.TextField(null=True)
     time = models.DateTimeField(blank=True, null=True)
     owner = models.ForeignKey(
         User, related_name="category", on_delete=models.CASCADE, null=True

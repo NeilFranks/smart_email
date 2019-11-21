@@ -284,7 +284,7 @@ def classifier_from_label(label, app_token):
     SVC = LinearSVC()
     SVC.fit(train_matrix, train_labels)
 
-    return SVC
+    return SVC, mcw
 
 
 def extract_features(mcw, emails):

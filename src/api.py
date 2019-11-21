@@ -28,7 +28,7 @@ from .serializers import (
 )
 from rest_framework.authtoken.models import Token
 
-from .learn import classifier_from_label
+from .learn import classifier_from_label, extract_features
 from .models import Category
 
 import codecs
@@ -37,6 +37,7 @@ import os
 import pickle
 import requests
 import time
+import base64
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -345,6 +346,67 @@ class BatchUnmarkFromSomethingViewSet(viewsets.GenericViewSet):
 
         batch_unmark_from_something(address, messageIds, labelList, token)
 
+class SetPageLabelsViewSet(viewsets.GenericViewSet):
+    permissions_classes = [permissions.IsAuthenticated]
+
+    def list(self, request):
+        pass
+
+    def post(self, request):
+        
+        try:
+            data = request.data
+            # auth is in headers like this when request comes from front end
+            headers = data.get("headers")
+            token = headers.get("Authorization")
+        except AttributeError:
+            # auth is like this when request comes from postman
+            token = request.META.get("HTTP_AUTHORIZATION")
+
+        # Emails need to have body/subject/id/address
+        emails = data.get("emails")
+        
+        # get categories
+        response = requests.get(
+            "%s/api/category/" % baseURL(),
+            headers={"Authorization": token}
+        )
+        
+        # turn categories into a dictionary
+        categories = json.loads(response.content)
+
+        # For each category saved
+        for category in categories:
+            addressDict = dict()
+
+            # grab the label_ids, classifier, and most common words from each category
+            email_label_ids = pickle.loads(base64.b64decode(category["label_id"]))
+            svc = pickle.loads(base64.b64decode(category["classifier"]))
+            mcw = pickle.loads(base64.b64decode(category["mcw"]))
+            
+            # generate feature matrix from the given emails
+            matrix = extract_features(mcw, emails)
+
+            # predict with saved model
+            email_predictions = svc.predict(matrix)
+
+            # For each prediction 
+            for i in range(len(email_predictions)):
+                
+                # if the model predicted that the email should be in the label
+                if email_predictions[i] == 1:
+                    
+                    # populate addressDict with only emails that are predicted
+                    address = emails[i].get("address")
+                    if address in addressDict:
+                        addressDict[address].append(emails[i].get("id"))
+                    else:
+                        addressDict[address] = [emails[i].get("id")]
+
+            # Mark all emails in addressDict with that proper label           
+            batch_mark_as_something(addressDict, email_label_ids, token)
+
+        return Response(data=response)
 
 class CreateLabelViewSet(viewsets.GenericViewSet):
     permissions_classes = [permissions.IsAuthenticated]
@@ -395,19 +457,21 @@ class CreateLabelViewSet(viewsets.GenericViewSet):
         batch_mark_as_something(addressDict, create_label_response, token)
 
         # train a model
-        SVC = classifier_from_label(label, token)
+        SVC, mcw = classifier_from_label(label, token)
 
         # save to database
         pickledSVC = codecs.encode(pickle.dumps(SVC), "base64").decode()
         pickledLabelDict = codecs.encode(
             pickle.dumps(create_label_response), "base64"
         ).decode()
+        pickledMCW = codecs.encode(pickle.dumps(mcw), "base64").decode()
 
         response = requests.post(
             "%s/api/category/" % baseURL(),
             headers={"Authorization": token},
             json={
                 "name": label,
+                "mcw": pickledMCW,
                 "label_id": pickledLabelDict,
                 "classifier": pickledSVC,
             },

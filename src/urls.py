@@ -16,6 +16,7 @@ from .api import (
     BatchMarkAsSomethingViewSet,
     BatchUnmarkFromSomethingViewSet,
     CreateLabelViewSet,
+    SetPageLabelsViewSet,
 )
 
 # from django.conf.urls import url
@@ -50,6 +51,7 @@ router.register(
     BatchUnmarkFromSomethingViewSet,
     "batchUnmarkFromSomething",
 )
+router.register("api/setPageLabel", SetPageLabelsViewSet, "setPageLabel")
 router.register("api/createLabel", CreateLabelViewSet, "createLabel")
 
 urlpatterns = router.urls
