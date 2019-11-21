@@ -39,15 +39,16 @@ export class Categories extends Component {
             <tbody>
               {this.props.selectedLabel == null ? (
                 <tr onClick={() => this.getEmailsFromLabel()} bgcolor="#eee">
-                  <th>All</th>
+                  {/* TODO: needs to just get from inbox by default, instead of all including sent */}
+                  <td>Inbox</td>
                   {/* for deletion: */}
-                  <th />
+                  <td />
                 </tr>
               ) : (
                 <tr onClick={() => this.getEmailsFromLabel()}>
-                  <th style={{ fontWeight: "normal" }}>All Categories</th>
+                  <td style={{ fontWeight: "normal" }}>Inbox</td>
                   {/* for deletion: */}
-                  <th />
+                  <td />
                 </tr>
               )}
               {this.props.categories.map(category =>

@@ -9,7 +9,8 @@ import {
 const initialState = {
   selectedLabel: null,
   emailDetails: [],
-  connectedAccounts: []
+  connectedAccounts: [],
+  loading: true
 };
 
 export default function(state = initialState, action) {
@@ -25,13 +26,15 @@ export default function(state = initialState, action) {
     case GET_EMAILDETAILS:
       return {
         ...state,
-        emailDetails: action.payload
+        emailDetails: action.payload,
+        loading: false
       };
     case SET_SELECTEDLABEL:
       return {
         ...state,
         selectedLabel: action.payload,
-        emailDetails: []
+        emailDetails: [],
+        loading: true
       };
     case GET_CONNECTEDACCOUNTS:
       return {
