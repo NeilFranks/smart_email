@@ -433,7 +433,7 @@ def get_email_details_from_account(connectionAndN):
                 charset, encoding, text = re.match(encoded_word_regex, str(sender.split("<")[0].strip("\""))).groups()
                 sender = text
             except:
-                sender = sender.split("<")[0]
+                sender = sender.split("<")[0].replace("\"", "")
             
             snippet = message.get("snippet")
             detailsList.append(
