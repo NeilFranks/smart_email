@@ -305,7 +305,7 @@ def extract_features(mcw, emails):
                     # print(word, mcw[i][0], i)
                     features_matrix[emailID, i] += 1
                     break
-        sub = email["body"]
+        sub = email["subject"]
         sub = (
             sub.replace("=0A", " ")
             .replace("=C2", " ")

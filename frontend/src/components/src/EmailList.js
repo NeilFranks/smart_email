@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
-import { getEmailDetails } from "../../actions/emailDetails";
+import { getEmailDetails, decide } from "../../actions/emailDetails";
 import Loader from "../layout/Loader";
 
 export class EmailList extends Component {
@@ -11,7 +11,8 @@ export class EmailList extends Component {
     emailDetails: PropTypes.array.isRequired,
     getEmailDetails: PropTypes.func.isRequired,
     selectedLabel: PropTypes.object,
-    loading: PropTypes.bool
+    loading: PropTypes.bool,
+    decide: PropTypes.func.isRequired
   };
 
   componentDidMount() {
@@ -27,6 +28,13 @@ export class EmailList extends Component {
           style={{ fontSize: "small" }}
         >
           newer
+        </button>
+        <button
+          style={{ marginLeft: "200px", fontSize: "small" }}
+          className="btn btn-info"
+          onClick={() => this.props.decide(this.props.emailDetails)}
+        >
+          DECIDE
         </button>
         <button
           style={{ float: "right", fontSize: "small" }}
@@ -199,5 +207,6 @@ const snippetPrepend = snippet => {
 };
 
 export default connect(mapStateToProps, {
-  getEmailDetails
+  getEmailDetails,
+  decide
 })(EmailList);

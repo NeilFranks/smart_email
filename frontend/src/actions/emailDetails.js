@@ -86,3 +86,19 @@ export const getConnectedAccounts = () => (dispatch, getState) => {
       dispatch(returnErrors(err.response.data, err.response.status))
     );
 };
+
+export const decide = emails => (dispatch, getState) => {
+  console.log(emails);
+  axios
+    .post("/api/setPageLabel/", tokenConfig(getState), {
+      data: {
+        emails: emails
+      }
+    })
+    .then(res => {
+      dispatch(createMessage({ decide: "Sorted some emails" }));
+    })
+    .catch(err =>
+      dispatch(returnErrors(err.response.data, err.response.status))
+    );
+};
