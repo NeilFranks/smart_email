@@ -315,6 +315,7 @@ def get_emails_from_label(connectionAndLabel):
             msg_str = base64.urlsafe_b64decode(message["raw"].encode("ASCII"))
             mime_msg = email.message_from_bytes(msg_str)
             subject = ""
+            body = ""
             try:
                 encoded_word_regex = r"=\?{1}(.+)\?{1}([B|Q])\?{1}(.+)\?{1}="
                 charset, encoding, encoded_text = re.match(

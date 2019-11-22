@@ -54,12 +54,8 @@ export class Categories extends Component {
               {this.props.categories.map(category =>
                 this.props.selectedLabel != null &&
                 this.props.selectedLabel.name == category.name ? (
-                  <tr
-                    key={category.id}
-                    onClick={() => this.getEmailsFromLabel(category)}
-                    bgcolor="#eee"
-                  >
-                    <td>
+                  <tr key={category.id} bgcolor="#eee">
+                    <td onClick={() => this.getEmailsFromLabel(category)}>
                       <strong>{category.name}</strong>
                     </td>
                     <td>
@@ -76,15 +72,10 @@ export class Categories extends Component {
                     </td>
                   </tr>
                 ) : (
-                  <tr
-                    key={category.id}
-                    onClick={() => this.getEmailsFromLabel(category)}
-                  >
-                    {this.highlight ? (
-                      <td bgcolor="#f00">{category.name}</td>
-                    ) : (
-                      <td>{category.name}</td>
-                    )}
+                  <tr key={category.id}>
+                    <td onClick={() => this.getEmailsFromLabel(category)}>
+                      {category.name}
+                    </td>
                     <td>
                       <button
                         onClick={this.props.deleteCategory.bind(
