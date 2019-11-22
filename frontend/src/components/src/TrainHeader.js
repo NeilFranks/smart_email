@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import { getTrainIds } from "../../actions/trainEmails";
 import { createLabel } from "../../actions/gmail";
+import Loader from "../layout/Loader";
 
 export class TrainHeader extends Component {
   state = {
@@ -13,17 +14,23 @@ export class TrainHeader extends Component {
     // trainModel: PropTypes.func.isRequired,
     trainIds: PropTypes.array.isRequired,
     trainEmails: PropTypes.array.isRequired,
-    createLabel: PropTypes.func.isRequired
+    createLabel: PropTypes.func.isRequired,
+    loading: PropTypes.bool
   };
 
   onChange = e => this.setState({ [e.target.name]: e.target.value });
 
   onSubmit = e => {
     e.preventDefault();
-    this.props.createLabel(this.state.category, this.props.trainEmails);
+    if (this.state.category && this.props.trainEmails.length > 0) {
+      this.props.createLabel(this.state.category, this.props.trainEmails);
+      this.render();
+    }
+    //TODO: else
   };
 
   render() {
+    console.log("norgs");
     const { category } = this.state;
     return (
       <Fragment>
@@ -78,6 +85,23 @@ export class TrainHeader extends Component {
                 </label>
               </div>
             )}
+            {this.props.loading ? (
+              <div
+                style={{
+                  display: "inline-block"
+                }}
+              >
+                <Loader
+                  style={{ position: "fixed", marginTop: "-35px" }}
+                ></Loader>
+              </div>
+            ) : (
+              <div
+                style={{
+                  display: "inline-block"
+                }}
+              ></div>
+            )}
             <div
               className="form-group"
               style={{ display: "inline-block", float: "right" }}
@@ -99,7 +123,8 @@ const arraySize = arr => {
 
 const mapStateToProps = state => ({
   trainIds: state.trainIds.trainIds,
-  trainEmails: state.trainEmails.trainEmails
+  trainEmails: state.trainEmails.trainEmails,
+  loading: state.categories.loading
 });
 
 export default connect(mapStateToProps, { getTrainIds, createLabel })(

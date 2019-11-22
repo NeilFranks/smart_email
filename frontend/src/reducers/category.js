@@ -2,11 +2,13 @@
 import {
   ADD_CATEGORY,
   GET_CATEGORY,
-  DELETE_CATEGORY
+  DELETE_CATEGORY,
+  LOADING
 } from "../actions/types.js";
 
 const initialState = {
-  categories: []
+  categories: [],
+  loading: false
 };
 
 export default function(state = initialState, action) {
@@ -27,6 +29,12 @@ export default function(state = initialState, action) {
         categories: state.categories.filter(
           categories => categories.id !== action.payload
         )
+      };
+    case LOADING:
+      console.log("huuhuhu");
+      return {
+        ...state,
+        loading: action.payload
       };
     default:
       return state;

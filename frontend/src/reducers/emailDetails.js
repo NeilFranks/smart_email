@@ -10,7 +10,7 @@ const initialState = {
   selectedLabel: null,
   emailDetails: [],
   connectedAccounts: [],
-  loading: true
+  loading: false
 };
 
 export default function(state = initialState, action) {

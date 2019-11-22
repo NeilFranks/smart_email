@@ -25,3 +25,4 @@ export const ADD_TRAINIDS = "ADD_TRAINIDS";
 export const REMOVE_TRAINIDS = "REMOVE_TRAINIDS";
 export const CREATE_LABEL = "CREATE_LABEL";
 export const SET_SELECTEDLABEL = "SET_SELECTEDLABEL";
+export const LOADING = "LOADING";

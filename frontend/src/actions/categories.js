@@ -56,7 +56,6 @@ export const deleteCategory = id => (dispatch, getState) => {
     .catch(err => console.log(err));
 
   //get inbox emails
-
   const before_time = Math.floor(Date.now() / 1000);
   axios
     .post("/api/emailDetails/", tokenConfig(getState), {
