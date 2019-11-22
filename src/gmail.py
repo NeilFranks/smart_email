@@ -5,6 +5,7 @@ from .credsApi import add_account, retrieve_accounts
 import email
 import base64
 import quopri
+import codecs
 import re
 import dateutil.parser
 import multiprocessing as mp
@@ -82,7 +83,10 @@ def get_email_body(msg, message_type):
                     output = body.decode()
                     # output = base64.urlsafe_b64decode(part.get_payload()).decode(encoding)
                 except:
-                    output = part.get_payload()
+                    try:
+                        output = base64.b64decode(part.get_payload()).decode()
+                    except:
+                        output = part.get_payload()
                 break
     elif "text" in m_type and "html" not in m_type:
         try:
@@ -95,9 +99,11 @@ def get_email_body(msg, message_type):
             elif encoding is "Q":
                 body = quopri.decodestring(encoded_text)
             output = body.decode()
-            # output = base64.urlsafe_b64decode(part.get_payload()).decode(encoding)
         except:
-            output = part.get_payload()
+            try:
+                output = base64.b64decode(part.get_payload()).decode()
+            except:
+                output = part.get_payload()
     return output
 
 
@@ -304,18 +310,10 @@ def get_emails_from_label(connectionAndLabel):
                 .get(userId="me", id=msg["id"], format="raw")
                 .execute()
             )
-            # payload = message.get('payload')
-            # headers = payload.get('headers')
-            # subject = ""
-            # for header in headers:
-            #     name = header.get('name')
-            #     if name == 'Subject':
-            #         subject = header.get('value')
 
             msg_str = base64.urlsafe_b64decode(message["raw"].encode("ASCII"))
             mime_msg = email.message_from_bytes(msg_str)
             subject = ""
-            body = ""
             try:
                 encoded_word_regex = r"=\?{1}(.+)\?{1}([B|Q])\?{1}(.+)\?{1}="
                 charset, encoding, encoded_text = re.match(
@@ -394,33 +392,50 @@ def get_email_details_from_account(connectionAndN):
                 .get(
                     userId="me",
                     id=label["id"],
-                    format="metadata",
-                    metadataHeaders=["Date", "From", "Subject"],
+                    format="raw"
                 )
                 .execute()
             )
 
-            # isolate the details
+            msg_str = base64.urlsafe_b64decode(message["raw"].encode("ASCII"))
+            mime_msg = email.message_from_bytes(msg_str)
+            body = ""
+            subject = ""
+            try:
+                encoded_word_regex = r"=\?{1}(.+)\?{1}([B|Q])\?{1}(.+)\?{1}="
+                charset, encoding, encoded_text = re.match(
+                    encoded_word_regex, mime_msg["Subject"]
+                ).groups()
+                if encoding is "B":
+                    subject = base64.b64decode(encoded_text)
+                elif encoding is "Q":
+                    subject = quopri.decodestring(encoded_text)
+                subject = subject.decode()
+            except:
+                subject = mime_msg["Subject"]
+
+            messageMainType = mime_msg.get_content_maintype()
+            if "multipart" in messageMainType:
+                body = get_email_body(mime_msg, messageMainType)
+            elif messageMainType == "text/plain":
+                try:
+                    body = base64.b64decode(mime_msg.get_payload()).decode()
+                except:
+                    body = mime_msg.get_payload()
             myId = message.get("id")
             labels = message.get("labelIds")
-            payload = message.get("payload")
-            # print(payload)
-            headers = payload.get("headers")
 
-            for header in headers:
-                name = header.get("name")
-                if name == "Date":
-                    date = header.get("value")
-                if name == "From":
-                    sender = header.get("value")
-                if name == "Subject":
-                    subject = header.get("value")
+            sender = mime_msg["From"]
+            date = mime_msg["Date"]
 
             # sender looks like "name <address@gmail.com>". We just want the first part
-            sender = sender.split("<")[0]
-
+            try:
+                charset, encoding, text = re.match(encoded_word_regex, str(sender.split("<")[0].strip("\""))).groups()
+                sender = text
+            except:
+                sender = sender.split("<")[0]
+            
             snippet = message.get("snippet")
-
             detailsList.append(
                 {
                     "address": connection.get("address"),
@@ -431,6 +446,7 @@ def get_email_details_from_account(connectionAndN):
                     "sender": sender,
                     "snippet": snippet,
                     "subject": subject,
+                    "body": body,
                 }
             )
 
