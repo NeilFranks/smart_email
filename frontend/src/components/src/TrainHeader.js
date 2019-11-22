@@ -30,7 +30,6 @@ export class TrainHeader extends Component {
   };
 
   render() {
-    console.log("norgs");
     const { category } = this.state;
     return (
       <Fragment>

@@ -31,7 +31,6 @@ export default function(state = initialState, action) {
         )
       };
     case LOADING:
-      console.log("huuhuhu");
       return {
         ...state,
         loading: action.payload
