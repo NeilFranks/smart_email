@@ -1,11 +1,17 @@
 from rest_framework import serializers
-from .models import ConnectedEmail
+from .models import Category, ConnectedEmail
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = "__all__"
 
 
 class ConnectNewEmailSerializer(serializers.ModelSerializer):
     class Meta:
         model = ConnectedEmail
-        fields = ('__all__')
+        fields = "__all__"
 
 
 class ConnectNewAccountSerializer(serializers.Serializer):
@@ -22,3 +28,11 @@ class EmailDetailsSerializer(serializers.Serializer):
 
 class ConnectedAddressesSerializer(serializers.Serializer):
     addresses = serializers.ListField()
+
+
+class McwFromLabelSerializer(serializers.Serializer):
+    mcw = serializers.ListField()
+
+
+class EmailsFromLabelSerializer(serializers.Serializer):
+    detailsList = serializers.ListField()

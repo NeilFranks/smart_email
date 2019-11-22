@@ -23,21 +23,25 @@ export class Header extends Component {
           <strong>{user ? `Welcome ${user.username}` : ""}</strong>
         </span>
 
-        <button
-          onClick={this.emailConnect}
-          className="nav-link btn btn-success btn-sm text-light"
-        >
-          Connected Accounts
-        </button>
-
-        <li className="nav-item">
+        <div>
           <button
-            onClick={this.props.logout}
-            className="nav-link btn btn-info btn-sm text-light"
+            onClick={this.emailConnect}
+            className="nav-link btn btn-success btn-sm text-light"
           >
-            Logout
+            Connected Accounts
           </button>
-        </li>
+        </div>
+
+        <div>
+          <li className="nav-item">
+            <button
+              onClick={this.props.logout}
+              className="nav-link btn btn-info btn-sm text-light"
+            >
+              Logout
+            </button>
+          </li>
+        </div>
       </ul>
     );
 
@@ -86,7 +90,4 @@ const mapStateToProps = state => ({
   auth: state.auth
 });
 
-export default connect(
-  mapStateToProps,
-  { logout }
-)(Header);
+export default connect(mapStateToProps, { logout })(Header);
