@@ -33,8 +33,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=100)),
-                ('categoryAlgorithmPair', models.ManyToManyField(to='users.CategoryAlgorithmPair')),
-                ('emailLogins', models.ManyToManyField(to='users.EmailLogin')),
+                ('categoryAlgorithmPair', models.ManyToManyField(to='src.CategoryAlgorithmPair')),
+                ('emailLogins', models.ManyToManyField(to='src.EmailLogin')),
             ],
         ),
     ]

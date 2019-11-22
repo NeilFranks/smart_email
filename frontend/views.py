@@ -19,3 +19,7 @@ def emailConnect(request):
 
 def emailView(request):
     return render(request, "frontend/emailView.html")
+
+
+def makeCategory(request):
+    return render(request, "frontend/MakeCategory.html")
