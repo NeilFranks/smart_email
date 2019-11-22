@@ -2,7 +2,7 @@ import axios from "axios";
 import { createMessage, returnErrors } from "./messages";
 import { tokenConfig } from "./auth";
 
-import { GET_EMAILDETAILS, GET_CONNECTEDACCOUNTS } from "./types";
+import { GET_EMAILDETAILS, GET_CONNECTEDACCOUNTS, GET_EMAIL } from "./types";
 import emailDetails from "../reducers/emailDetails";
 
 export const getEmailDetails = addressList => (dispatch, getState) => {
@@ -22,6 +22,16 @@ export const getEmailDetails = addressList => (dispatch, getState) => {
     .catch(err =>
       dispatch(returnErrors(err.response.data, err.response.status))
     );
+};
+
+export const getEmail = (EMAIL) => (dispatch, getState) => {
+
+    dispatch({
+      type: GET_EMAIL,
+      payload: EMAIL
+    });
+  
+
 };
 
 export const getConnectedAccounts = () => (dispatch, getState) => {
