@@ -22,27 +22,6 @@ export class EmailList extends Component {
   render() {
     return (
       <Fragment>
-        <button
-          className="btn btn-success"
-          onClick={() => this.prev()}
-          style={{ fontSize: "small" }}
-        >
-          newer
-        </button>
-        <button
-          style={{ marginLeft: "200px", fontSize: "small" }}
-          className="btn btn-info"
-          onClick={() => this.props.decide(this.props.emailDetails)}
-        >
-          DECIDE
-        </button>
-        <button
-          style={{ float: "right", fontSize: "small" }}
-          className="btn btn-success"
-          onClick={() => this.next(this.props.emailDetails)}
-        >
-          older
-        </button>
         {!this.props.loading ? (
           !this.props.emailDetails.length ? (
             <div
@@ -56,92 +35,130 @@ export class EmailList extends Component {
               no emails found
             </div>
           ) : (
-            <table
-              className="table table-hover"
-              style={{ fontSize: "smaller" }}
-            >
-              <tbody>
-                {this.props.emailDetails.map(emailDetails =>
-                  emailDetails.unread ? (
-                    <tr key={emailDetails.id} bgcolor="#fff">
-                      <td
-                        style={{
-                          whiteSpace: "nowrap",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          width: "20%",
-                          maxWidth: "0"
-                        }}
-                      >
-                        <strong>{emailDetails.sender}</strong>
-                      </td>
-                      <td
-                        style={{
-                          whiteSpace: "nowrap",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          width: "65%",
-                          maxWidth: "0"
-                        }}
-                      >
-                        <strong>{emailDetails.subject}</strong>
-                        {snippetPrepend(emailDetails.snippet)}
-                      </td>
-                      <td
-                        style={{
-                          whiteSpace: "nowrap",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          width: "15%",
-                          maxWidth: "0"
-                        }}
-                        align="right"
-                      >
-                        {dateString(new Date(emailDetails.date))}
-                      </td>
-                    </tr>
-                  ) : (
-                    <tr key={emailDetails.id} bgcolor="#ddd">
-                      <td
-                        style={{
-                          whiteSpace: "nowrap",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          width: "20%",
-                          maxWidth: "0"
-                        }}
-                      >
-                        {emailDetails.sender}
-                      </td>
-                      <td
-                        style={{
-                          whiteSpace: "nowrap",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          width: "65%",
-                          maxWidth: "0"
-                        }}
-                      >
-                        {emailDetails.subject}
-                        {snippetPrepend(emailDetails.snippet)}
-                      </td>
-                      <td
-                        style={{
-                          whiteSpace: "nowrap",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          width: "15%",
-                          maxWidth: "0"
-                        }}
-                        align="right"
-                      >
-                        {dateString(new Date(emailDetails.date))}
-                      </td>
-                    </tr>
-                  )
+            <div>
+              <div style={{ textAlign: "center" }}>
+                <button
+                  className="btn btn-success"
+                  onClick={() => this.prev()}
+                  style={{
+                    float: "left",
+                    fontSize: "small"
+                  }}
+                >
+                  newer
+                </button>
+                {this.props.selectedLabel == null ? (
+                  <button
+                    style={{
+                      textAlign: "center",
+                      fontSize: "small"
+                    }}
+                    className="btn btn-info"
+                    onClick={() => this.props.decide(this.props.emailDetails)}
+                  >
+                    DECIDE
+                  </button>
+                ) : (
+                  <div></div>
                 )}
-              </tbody>
-            </table>
+                <button
+                  style={{
+                    float: "right",
+                    fontSize: "small"
+                  }}
+                  className="btn btn-success"
+                  onClick={() => this.next(this.props.emailDetails)}
+                >
+                  older
+                </button>
+              </div>
+              <table
+                className="table table-hover"
+                style={{ fontSize: "smaller" }}
+              >
+                <tbody>
+                  {this.props.emailDetails.map(emailDetails =>
+                    emailDetails.unread ? (
+                      <tr key={emailDetails.id} bgcolor="#fff">
+                        <td
+                          style={{
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            width: "20%",
+                            maxWidth: "0"
+                          }}
+                        >
+                          <strong>{emailDetails.sender}</strong>
+                        </td>
+                        <td
+                          style={{
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            width: "65%",
+                            maxWidth: "0"
+                          }}
+                        >
+                          <strong>{emailDetails.subject}</strong>
+                          {snippetPrepend(emailDetails.snippet)}
+                        </td>
+                        <td
+                          style={{
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            width: "15%",
+                            maxWidth: "0"
+                          }}
+                          align="right"
+                        >
+                          {dateString(new Date(emailDetails.date))}
+                        </td>
+                      </tr>
+                    ) : (
+                      <tr key={emailDetails.id} bgcolor="#ddd">
+                        <td
+                          style={{
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            width: "20%",
+                            maxWidth: "0"
+                          }}
+                        >
+                          {emailDetails.sender}
+                        </td>
+                        <td
+                          style={{
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            width: "65%",
+                            maxWidth: "0"
+                          }}
+                        >
+                          {emailDetails.subject}
+                          {snippetPrepend(emailDetails.snippet)}
+                        </td>
+                        <td
+                          style={{
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            width: "15%",
+                            maxWidth: "0"
+                          }}
+                          align="right"
+                        >
+                          {dateString(new Date(emailDetails.date))}
+                        </td>
+                      </tr>
+                    )
+                  )}
+                </tbody>
+              </table>
+            </div>
           )
         ) : (
           <Loader

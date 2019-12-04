@@ -44,7 +44,7 @@ router.register("api/batchMarkAsRead", BatchMarkAsReadViewSet, "batchMarkAsRead"
 router.register("api/batchMarkAsUnread", BatchMarkAsUnreadViewSet, "batchMarkAsUnread")
 router.register("api/trashMessage", TrashViewSet, "trashMessage")
 router.register(
-    "api/batchMarkAsSomething", BatchMarkAsSomethingViewSet, "batchMarkAsSomething"
+    "api/batcDhMarkAsSomething", BatchMarkAsSomethingViewSet, "batchMarkAsSomething"
 )
 router.register(
     "api/batchUnmarkFromSomething",
