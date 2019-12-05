@@ -1,13 +1,11 @@
 import React, { Component, Fragment } from "react";
 import ReactDOM from "react-dom";
 import { HashRouter as Router, Route, Switch } from "react-router-dom";
-import history from "./src/history";
 
 import { Provider as AlertProvider } from "react-alert";
 import AlertTemplate from "react-alert-template-basic";
 
 import Header from "./layout/Header";
-import ViewEmailDashboard from "./src/ViewEmailDashboard";
 import Alerts from "./layout/Alerts";
 import Login from "./accounts/Login";
 import Register from "./accounts/Register";
@@ -16,6 +14,7 @@ import PrivateRoute from "./common/PrivateRoute";
 import { Provider } from "react-redux";
 import store from "../store";
 import { loadUser } from "../actions/auth";
+import RetrainCategoryDashboard from "./src/RetrainCategoryDashboard";
 
 // Alert Options
 const alertOptions = {
@@ -23,7 +22,7 @@ const alertOptions = {
   position: "bottom center"
 };
 
-class EmailView extends Component {
+class RetrainCategory extends Component {
   componentDidMount() {
     store.dispatch(loadUser());
   }
@@ -38,7 +37,11 @@ class EmailView extends Component {
               <Alerts />
               <div className="container">
                 <Switch>
-                  <PrivateRoute exact path="/" component={ViewEmailDashboard} />
+                  <PrivateRoute
+                    exact
+                    path="/"
+                    component={RetrainCategoryDashboard}
+                  />
                   <Route exact path="/register" component={Register} />
                   <Route exact path="/login" component={Login} />
                 </Switch>
@@ -51,4 +54,7 @@ class EmailView extends Component {
   }
 }
 
-ReactDOM.render(<EmailView />, document.getElementById("emailView"));
+ReactDOM.render(
+  <RetrainCategory />,
+  document.getElementById("RetrainCategory")
+);

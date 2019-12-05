@@ -1,4 +1,5 @@
 import React, { Component, Fragment } from "react";
+import history from "./history";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import { getEmailDetails, decide } from "../../actions/emailDetails";
@@ -59,7 +60,21 @@ export class EmailList extends Component {
                     DECIDE
                   </button>
                 ) : (
-                  <div></div>
+                  <button
+                    style={{
+                      textAlign: "center",
+                      fontSize: "small"
+                    }}
+                    className="btn btn-info"
+                    onClick={() =>
+                      history.push({
+                        pathname: "/retrainCategory",
+                        data: this.props.selectedLabel
+                      })
+                    }
+                  >
+                    RETRAIN
+                  </button>
                 )}
                 <button
                   style={{

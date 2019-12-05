@@ -16,6 +16,7 @@ from .api import (
     BatchMarkAsSomethingViewSet,
     BatchUnmarkFromSomethingViewSet,
     CreateLabelViewSet,
+    RetrainLabelViewSet,
     SetPageLabelsViewSet,
 )
 
@@ -53,5 +54,6 @@ router.register(
 )
 router.register("api/setPageLabel", SetPageLabelsViewSet, "setPageLabel")
 router.register("api/createLabel", CreateLabelViewSet, "createLabel")
+router.register("api/retrainLabel", RetrainLabelViewSet, "retrainLabel")
 
 urlpatterns = router.urls

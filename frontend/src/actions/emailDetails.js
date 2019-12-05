@@ -13,6 +13,10 @@ export const getEmailDetails = (before_time, category) => (
   dispatch,
   getState
 ) => {
+  console.log("AHH");
+  console.log(category);
+  console.log("BHH");
+
   // set the label you selected
   dispatch({
     type: SET_SELECTEDLABEL,

@@ -14,6 +14,8 @@ from .gmail import (
     batch_unmark_from_something,
     create_label,
 )
+from .learn import mcw_from_label
+
 from rest_framework.response import Response
 from rest_framework import viewsets, permissions
 from .serializers import (
@@ -321,7 +323,7 @@ class BatchMarkAsSomethingViewSet(viewsets.GenericViewSet):
             # auth is like this when request comes from postman
             token = request.META.get("HTTP_AUTHORIZATION")
 
-        batch_mark_as_something(address, messageIds, labelList, token)
+        # batch_mark_as_something(address, messageIds, labelList, token)
 
 
 class BatchUnmarkFromSomethingViewSet(viewsets.GenericViewSet):
@@ -344,7 +346,7 @@ class BatchUnmarkFromSomethingViewSet(viewsets.GenericViewSet):
             # auth is like this when request comes from postman
             token = request.META.get("HTTP_AUTHORIZATION")
 
-        batch_unmark_from_something(address, messageIds, labelList, token)
+        # batch_unmark_from_something(address, messageIds, labelList, token)
 
 
 class SetPageLabelsViewSet(viewsets.GenericViewSet):
@@ -481,6 +483,65 @@ class CreateLabelViewSet(viewsets.GenericViewSet):
                 "label_id": pickledLabelDict,
                 "classifier": pickledSVC,
             },
+        )
+
+        return Response(data=response, status=response.status_code)
+
+
+class RetrainLabelViewSet(viewsets.GenericViewSet):
+    permissions_classes = [permissions.IsAuthenticated]
+
+    def list(self, request):
+        pass
+
+    def post(self, request):
+        data = request.data
+
+        try:
+            # auth is in headers like this when request comes from front end
+            headers = data.get("headers")
+            token = headers.get("Authorization")
+        except AttributeError:
+            # auth is like this when request comes from postman
+            token = request.META.get("HTTP_AUTHORIZATION")
+
+        label = data.get("label")
+        n = data.get("n")  # there will be n emails that SHOULD be in category
+        notEmails = data.get(
+            "notEmails"
+        )  # these are emails that should NOT be in the category.
+
+        # STEP ONE: move notEmails out of the category
+        # decode label_id
+        label_id = pickle.loads(base64.b64decode(label["label_id"]))
+
+        addressDict = dict()
+        for email in notEmails:
+            address = email.get("address")
+            if address in addressDict:
+                addressDict[address].append(email.get("id"))
+            else:
+                addressDict[address] = [email.get("id")]
+
+        batch_unmark_from_something(addressDict, label_id, token)
+
+        # STEP TWO: get n email from category
+
+        # just want most recent emails
+        before_time = int(time.time())
+        emails = get_email_details(n, before_time, label_id, token)
+
+        # STEP 3: train a new model
+        SVC, mcw = classifier_from_label(label, notEmails, token)
+
+        # save to database
+        pickledSVC = codecs.encode(pickle.dumps(SVC), "base64").decode()
+        pickledMCW = codecs.encode(pickle.dumps(mcw), "base64").decode()
+
+        response = requests.post(
+            "%s/api/category/" % baseURL(),
+            headers={"Authorization": token},
+            json={"id": label["id"], "mcw": pickledMCW, "classifier": pickledSVC},
         )
 
         return Response(data=response, status=response.status_code)

@@ -492,21 +492,24 @@ def create_label(label_object, app_token):
     return labelDict
 
 
-def batch_unmark_from_something(account, list_of_ids, list_of_labels, app_token):
-    connections = retrieve_accounts(app_token)
-    for connection in connections:
-        if account == connection.get("address"):
-            creds = connection.get("creds")
-            service = build("gmail", "v1", credentials=creds)
-            messages = (
-                service.users()
-                .messages()
-                .batchModify(
-                    userId="me",
-                    body={"ids": list_of_ids, "removeLabelIds": list_of_labels},
+def batch_unmark_from_something(addressDict, label_dict, app_token):
+    for address in addressDict:
+        list_of_ids = addressDict[address]
+        connections = retrieve_accounts(app_token)
+        for connection in connections:
+            if address == connection.get("address"):
+                list_of_labels = label_dict[address]
+                creds = connection.get("creds")
+                service = build("gmail", "v1", credentials=creds)
+                messages = (
+                    service.users()
+                    .messages()
+                    .batchModify(
+                        userId="me",
+                        body={"ids": list_of_ids, "removeLabelIds": list_of_labels},
+                    )
+                    .execute()
                 )
-                .execute()
-            )
 
 
 def batch_mark_as_something(addressDict, label_dict, app_token):
@@ -600,6 +603,6 @@ def trash_message(account, message_id, app_token):
 
 if __name__ == "__main__":
     tok = "5333867a0eeb9d3f7c29eb404ced841e663ba0816aeeffbe10d3c6e3396d2538"
-    bil = get_email_details("neilcapstonetest@gmail.com", 2, tok)
+    # bil = get_email_details("neilcapstonetest@gmail.com", 2, tok)
     hum = get_single_email("neilcapstonetest@gmail.com", "16e1ffd1248982ac", tok)
 

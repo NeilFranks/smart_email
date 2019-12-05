@@ -20,7 +20,6 @@ export class Register extends Component {
 
   onSubmit = e => {
     e.preventDefault();
-    console.log("dude");
     const { username, email, password, password2 } = this.state;
     if (password !== password2) {
       this.props.createMessage({ passwordNotMatch: "Passwords do not match" });
@@ -105,7 +104,4 @@ const mapStateToProps = state => ({
   isAuthenticated: state.auth.isAuthenticated
 });
 
-export default connect(
-  mapStateToProps,
-  { register, createMessage }
-)(Register);
+export default connect(mapStateToProps, { register, createMessage })(Register);

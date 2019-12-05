@@ -206,7 +206,9 @@ def remove_common_words(dict):
 # This naming is going to have to change.
 def mcw_from_label(label, app_token):
     email_list = get_email_details_from_label(label, app_token)
-    second_list = get_emails_details_not_from_label(label, app_token, len(email_list))
+    second_list = get_emails_details_not_from_label(
+        label, None, app_token, len(email_list)
+    )
     full_list = second_list + email_list
     word_list = []
     for email in full_list:
@@ -250,9 +252,14 @@ def mcw_from_label(label, app_token):
 
 def classifier_from_label(label, notEmails, app_token):
     email_list = get_email_details_from_label(label, app_token)
-    second_list = get_emails_details_not_from_label(
-        label, notEmails, app_token, len(email_list)
-    )
+    n = len(email_list)
+
+    # if you were not provided enough "not in category" emails, go get some random ones from some other labels.
+    if len(notEmails) < n:
+        second_list = get_emails_details_not_from_label(label, notEmails, app_token, n)
+    else:
+        second_list = notEmails[0:n]
+
     full_list = second_list + email_list
     word_list = []
     for email in full_list:
@@ -278,7 +285,7 @@ def classifier_from_label(label, notEmails, app_token):
     remove_common_words(mcw)
     mcw = mcw.most_common(200)
     train_labels = np.zeros(len(full_list))
-    train_labels[len(email_list) :] = 1
+    train_labels[n:] = 1
 
     train_matrix = extract_features(mcw, full_list)
 

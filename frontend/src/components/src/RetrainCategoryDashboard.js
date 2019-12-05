@@ -1,12 +1,12 @@
 import React, { Fragment } from "react";
-import TrainHeader from "./TrainHeader";
-import PickEmailList from "./PickEmailList";
-import TrainList from "./TrainList";
+import RetrainHeader from "./RetrainHeader";
+import CategoryList from "./CategoryList";
+import NotList from "./NotList";
 
-export default function MakeCategoryDashboard() {
+export default function RetrainCategoryDashboard() {
   return (
     <Fragment>
-      <TrainHeader />
+      <RetrainHeader />
       <table className="table">
         <tbody>
           <tr>
@@ -17,7 +17,7 @@ export default function MakeCategoryDashboard() {
                 overflow: "scroll"
               }}
             >
-              <PickEmailList />
+              <CategoryList />
             </td>
 
             <td
@@ -27,7 +27,7 @@ export default function MakeCategoryDashboard() {
                 overflow: "scroll"
               }}
             >
-              <TrainList />
+              <NotList />
             </td>
           </tr>
         </tbody>
