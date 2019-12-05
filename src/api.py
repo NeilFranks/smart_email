@@ -421,6 +421,9 @@ class CreateLabelViewSet(viewsets.GenericViewSet):
         data = request.data
         label = data.get("label")
         emails = data.get("emails")
+        notEmails = data.get(
+            "notEmails"
+        )  # these are emails that should NOT be in the category.
         try:
             data = request.data
             # auth is in headers like this when request comes from front end
@@ -460,7 +463,7 @@ class CreateLabelViewSet(viewsets.GenericViewSet):
         batch_mark_as_something(addressDict, create_label_response, token)
 
         # train a model
-        SVC, mcw = classifier_from_label(label, token)
+        SVC, mcw = classifier_from_label(label, notEmails, token)
 
         # save to database
         pickledSVC = codecs.encode(pickle.dumps(SVC), "base64").decode()

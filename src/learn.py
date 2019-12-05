@@ -248,9 +248,11 @@ def mcw_from_label(label, app_token):
     # This naming is going to have to change.
 
 
-def classifier_from_label(label, app_token):
+def classifier_from_label(label, notEmails, app_token):
     email_list = get_email_details_from_label(label, app_token)
-    second_list = get_emails_details_not_from_label(label, app_token, len(email_list))
+    second_list = get_emails_details_not_from_label(
+        label, notEmails, app_token, len(email_list)
+    )
     full_list = second_list + email_list
     word_list = []
     for email in full_list:

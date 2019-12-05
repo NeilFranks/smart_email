@@ -164,10 +164,13 @@ def get_email_details_from_label(label, app_token):
     return detailsList
 
 
-def get_emails_details_not_from_label(label, app_token, size):
+def get_emails_details_not_from_label(label, notEmails, app_token, size):
     """
     Returns id, date (and time), from, and subject of the most recent n emails sent to the address.
     """
+    idList = []  # idList is IDs of emails you already will train with
+    for email in notEmails:
+        idList.append(email.get("id"))
 
     connections = retrieve_accounts(app_token)
     detailsList = []
@@ -178,7 +181,7 @@ def get_emails_details_not_from_label(label, app_token, size):
     # Step 2: `pool.map` the `get_email_details_from_account()`
     detailsList = pool.map(
         get_emails_not_from_label,
-        [(connection, label, size) for connection in connections],
+        [(connection, label, idList, size) for connection in connections],
     )  # Returns a list of lists
 
     # Flatten the list of lists
@@ -186,6 +189,13 @@ def get_emails_details_not_from_label(label, app_token, size):
 
     # Step 3: Don't forget to close
     pool.close()
+
+    diff = size - len(idList)
+    if len(detailsList) > diff:
+        detailsList = detailsList[0:diff]
+
+    for email in notEmails:
+        detailsList.append(email)
 
     return detailsList
 
@@ -210,7 +220,10 @@ def get_emails_not_from_label(connectionAndLabel):
 
     connection = connectionAndLabel[0]
     label = connectionAndLabel[1]
-    size = connectionAndLabel[2]
+    idList = connectionAndLabel[2]
+    size = connectionAndLabel[3]
+
+    print("idList size: %s" % len(idList))
 
     # get access to emails
     creds = connection.get("creds")
@@ -227,7 +240,11 @@ def get_emails_not_from_label(connectionAndLabel):
     results = (
         service.users()
         .messages()
-        .list(userId="me", maxResults=size, q="is:read -label:{}".format(label))
+        .list(
+            userId="me",
+            maxResults=size + len(idList),
+            q="is:read -label:{}".format(label),
+        )
         .execute()
     )
     msgs = results.get("messages", [])
@@ -236,45 +253,45 @@ def get_emails_not_from_label(connectionAndLabel):
         print("No messages")
     else:
         for msg in msgs:
+            if msg["id"] not in idList:
+                message = (
+                    service.users()
+                    .messages()
+                    .get(userId="me", id=msg["id"], format="raw")
+                    .execute()
+                )
 
-            message = (
-                service.users()
-                .messages()
-                .get(userId="me", id=msg["id"], format="raw")
-                .execute()
-            )
-
-            msg_str = base64.urlsafe_b64decode(message["raw"].encode("ASCII"))
-            mime_msg = email.message_from_bytes(msg_str)
-            subject = ""
-            body = ""
-            try:
-                encoded_word_regex = r"=\?{1}(.+)\?{1}([B|Q])\?{1}(.+)\?{1}="
-                charset, encoding, encoded_text = re.match(
-                    encoded_word_regex, mime_msg["Subject"]
-                ).groups()
-                if encoding is "B":
-                    subject = base64.b64decode(encoded_text)
-                elif encoding is "Q":
-                    subject = quopri.decodestring(encoded_text)
-                subject = subject.decode()
-            except:
-                subject = mime_msg["Subject"]
-            messageMainType = mime_msg.get_content_maintype()
-            if "multipart" in messageMainType:
-                body = get_email_body(mime_msg, messageMainType)
-            elif messageMainType == "text/plain":
-                body = mime_msg.get_payload()
-            # isolate the details
-            myId = message.get("id")
-            detailsList.append(
-                {
-                    "address": connection.get("address"),
-                    "id": myId,
-                    "body": body,
-                    "subject": subject,
-                }
-            )
+                msg_str = base64.urlsafe_b64decode(message["raw"].encode("ASCII"))
+                mime_msg = email.message_from_bytes(msg_str)
+                subject = ""
+                body = ""
+                try:
+                    encoded_word_regex = r"=\?{1}(.+)\?{1}([B|Q])\?{1}(.+)\?{1}="
+                    charset, encoding, encoded_text = re.match(
+                        encoded_word_regex, mime_msg["Subject"]
+                    ).groups()
+                    if encoding is "B":
+                        subject = base64.b64decode(encoded_text)
+                    elif encoding is "Q":
+                        subject = quopri.decodestring(encoded_text)
+                    subject = subject.decode()
+                except:
+                    subject = mime_msg["Subject"]
+                messageMainType = mime_msg.get_content_maintype()
+                if "multipart" in messageMainType:
+                    body = get_email_body(mime_msg, messageMainType)
+                elif messageMainType == "text/plain":
+                    body = mime_msg.get_payload()
+                # isolate the details
+                myId = message.get("id")
+                detailsList.append(
+                    {
+                        "address": connection.get("address"),
+                        "id": myId,
+                        "body": body,
+                        "subject": subject,
+                    }
+                )
 
     return detailsList
 
@@ -389,11 +406,7 @@ def get_email_details_from_account(connectionAndN):
             message = (
                 service.users()
                 .messages()
-                .get(
-                    userId="me",
-                    id=label["id"],
-                    format="raw"
-                )
+                .get(userId="me", id=label["id"], format="raw")
                 .execute()
             )
 
@@ -430,11 +443,13 @@ def get_email_details_from_account(connectionAndN):
 
             # sender looks like "name <address@gmail.com>". We just want the first part
             try:
-                charset, encoding, text = re.match(encoded_word_regex, str(sender.split("<")[0].strip("\""))).groups()
+                charset, encoding, text = re.match(
+                    encoded_word_regex, str(sender.split("<")[0].strip('"'))
+                ).groups()
                 sender = text
             except:
-                sender = sender.split("<")[0].replace("\"", "")
-            
+                sender = sender.split("<")[0].replace('"', "")
+
             snippet = message.get("snippet")
             detailsList.append(
                 {
