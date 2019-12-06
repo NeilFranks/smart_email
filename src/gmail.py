@@ -139,10 +139,12 @@ def get_email_details(n, before_time, label_id, app_token):
     return detailsList
 
 
-def get_email_details_from_label(label, app_token):
+def get_email_details_from_label(n, label, app_token):
     """
     Returns id, date (and time), from, and subject of the most recent n emails sent to the address.
     """
+    print("oogog")
+    print(n)
 
     connections = retrieve_accounts(app_token)
     detailsList = []
@@ -152,7 +154,7 @@ def get_email_details_from_label(label, app_token):
 
     # Step 2: `pool.map` the `get_email_details_from_account()`
     detailsList = pool.map(
-        get_emails_from_label, [(connection, label) for connection in connections]
+        get_emails_from_label, [(connection, label, n) for connection in connections]
     )  # Returns a list of lists
 
     # Flatten the list of lists
@@ -164,10 +166,15 @@ def get_email_details_from_label(label, app_token):
     return detailsList
 
 
-def get_emails_details_not_from_label(label, app_token, size):
+def get_emails_details_not_from_label(label, notEmails, app_token, size):
     """
     Returns id, date (and time), from, and subject of the most recent n emails sent to the address.
     """
+    idList = []  # idList is IDs of emails you already will train with
+
+    if notEmails:
+        for email in notEmails:
+            idList.append(email.get("id"))
 
     connections = retrieve_accounts(app_token)
     detailsList = []
@@ -178,7 +185,7 @@ def get_emails_details_not_from_label(label, app_token, size):
     # Step 2: `pool.map` the `get_email_details_from_account()`
     detailsList = pool.map(
         get_emails_not_from_label,
-        [(connection, label, size) for connection in connections],
+        [(connection, label, idList, size) for connection in connections],
     )  # Returns a list of lists
 
     # Flatten the list of lists
@@ -186,6 +193,14 @@ def get_emails_details_not_from_label(label, app_token, size):
 
     # Step 3: Don't forget to close
     pool.close()
+
+    diff = size - len(idList)
+    if len(detailsList) > diff:
+        detailsList = detailsList[0:diff]
+
+    if notEmails:
+        for email in notEmails:
+            detailsList.append(email)
 
     return detailsList
 
@@ -210,24 +225,88 @@ def get_emails_not_from_label(connectionAndLabel):
 
     connection = connectionAndLabel[0]
     label = connectionAndLabel[1]
-    size = connectionAndLabel[2]
+    idList = connectionAndLabel[2]
+    size = connectionAndLabel[3]
 
     # get access to emails
     creds = connection.get("creds")
     service = build("gmail", "v1", credentials=creds)
-    response = service.users().labels().list(userId="me").execute()
-    labels = response["labels"]
 
-    label_id = list()
-    for i in labels:
-        if i["name"] == label:
-            label_id.append(i["id"].lstrip())
-            break
+    print(label)
+    print(size)
 
     results = (
         service.users()
         .messages()
-        .list(userId="me", maxResults=size, q="is:read -label:{}".format(label))
+        .list(userId="me", maxResults=size + len(idList), q="-label:{}".format(label))
+        .execute()
+    )
+    print("ahah")
+    msgs = results.get("messages", [])
+
+    if not msgs:
+        print("No messages")
+    else:
+        for msg in msgs:
+            if msg["id"] not in idList:
+                message = (
+                    service.users()
+                    .messages()
+                    .get(userId="me", id=msg["id"], format="raw")
+                    .execute()
+                )
+
+                msg_str = base64.urlsafe_b64decode(message["raw"].encode("ASCII"))
+                mime_msg = email.message_from_bytes(msg_str)
+                subject = ""
+                body = ""
+                try:
+                    encoded_word_regex = r"=\?{1}(.+)\?{1}([B|Q])\?{1}(.+)\?{1}="
+                    charset, encoding, encoded_text = re.match(
+                        encoded_word_regex, mime_msg["Subject"]
+                    ).groups()
+                    if encoding is "B":
+                        subject = base64.b64decode(encoded_text)
+                    elif encoding is "Q":
+                        subject = quopri.decodestring(encoded_text)
+                    subject = subject.decode()
+                except:
+                    subject = mime_msg["Subject"]
+                messageMainType = mime_msg.get_content_maintype()
+                if "multipart" in messageMainType:
+                    body = get_email_body(mime_msg, messageMainType)
+                elif messageMainType == "text/plain":
+                    body = mime_msg.get_payload()
+                # isolate the details
+                myId = message.get("id")
+                detailsList.append(
+                    {
+                        "address": connection.get("address"),
+                        "id": myId,
+                        "body": body,
+                        "subject": subject,
+                    }
+                )
+
+    return detailsList
+
+
+def get_emails_from_label(connectionAndLabel):
+    detailsList = []
+
+    connection = connectionAndLabel[0]
+    label = connectionAndLabel[1]
+    n = connectionAndLabel[2]
+
+    print(label)
+
+    # using label, get n emails
+    creds = connection.get("creds")
+    service = build("gmail", "v1", credentials=creds)
+    results = (
+        service.users()
+        .messages()
+        .list(userId="me", maxResults=n, q="label:{}".format(label))
         .execute()
     )
     msgs = results.get("messages", [])
@@ -236,7 +315,6 @@ def get_emails_not_from_label(connectionAndLabel):
         print("No messages")
     else:
         for msg in msgs:
-
             message = (
                 service.users()
                 .messages()
@@ -248,72 +326,6 @@ def get_emails_not_from_label(connectionAndLabel):
             mime_msg = email.message_from_bytes(msg_str)
             subject = ""
             body = ""
-            try:
-                encoded_word_regex = r"=\?{1}(.+)\?{1}([B|Q])\?{1}(.+)\?{1}="
-                charset, encoding, encoded_text = re.match(
-                    encoded_word_regex, mime_msg["Subject"]
-                ).groups()
-                if encoding is "B":
-                    subject = base64.b64decode(encoded_text)
-                elif encoding is "Q":
-                    subject = quopri.decodestring(encoded_text)
-                subject = subject.decode()
-            except:
-                subject = mime_msg["Subject"]
-            messageMainType = mime_msg.get_content_maintype()
-            if "multipart" in messageMainType:
-                body = get_email_body(mime_msg, messageMainType)
-            elif messageMainType == "text/plain":
-                body = mime_msg.get_payload()
-            # isolate the details
-            myId = message.get("id")
-            detailsList.append(
-                {
-                    "address": connection.get("address"),
-                    "id": myId,
-                    "body": body,
-                    "subject": subject,
-                }
-            )
-
-    return detailsList
-
-
-def get_emails_from_label(connectionAndLabel):
-    detailsList = []
-
-    connection = connectionAndLabel[0]
-    label = connectionAndLabel[1]
-
-    # get access to emails
-    creds = connection.get("creds")
-    service = build("gmail", "v1", credentials=creds)
-    response = service.users().labels().list(userId="me").execute()
-    labels = response["labels"]
-
-    label_id = list()
-    for i in labels:
-        if i["name"] == label:
-            label_id.append(i["id"].lstrip())
-            break
-
-    results = service.users().messages().list(userId="me", labelIds=label_id).execute()
-    msgs = results.get("messages", [])
-
-    if not msgs:
-        print("No messages")
-    else:
-        for msg in msgs:
-            message = (
-                service.users()
-                .messages()
-                .get(userId="me", id=msg["id"], format="raw")
-                .execute()
-            )
-
-            msg_str = base64.urlsafe_b64decode(message["raw"].encode("ASCII"))
-            mime_msg = email.message_from_bytes(msg_str)
-            subject = ""
             try:
                 encoded_word_regex = r"=\?{1}(.+)\?{1}([B|Q])\?{1}(.+)\?{1}="
                 charset, encoding, encoded_text = re.match(
@@ -389,11 +401,7 @@ def get_email_details_from_account(connectionAndN):
             message = (
                 service.users()
                 .messages()
-                .get(
-                    userId="me",
-                    id=label["id"],
-                    format="raw"
-                )
+                .get(userId="me", id=label["id"], format="raw")
                 .execute()
             )
 
@@ -406,11 +414,19 @@ def get_email_details_from_account(connectionAndN):
                 charset, encoding, encoded_text = re.match(
                     encoded_word_regex, mime_msg["Subject"]
                 ).groups()
-                if encoding is "B":
+
+                subject = mime_msg["Subject"]
+                if "=?US-ASCII?Q?" in subject:
+                    subject = subject.replace("=?US-ASCII?Q?", "")
+                    subject = subject.replace("?=", "")
+                    subject = subject.replace("?= ", "")
+                elif encoding is "B":
                     subject = base64.b64decode(encoded_text)
+                    subject = subject.decode()
                 elif encoding is "Q":
                     subject = quopri.decodestring(encoded_text)
-                subject = subject.decode()
+                    subject = subject.decode()
+
             except:
                 subject = mime_msg["Subject"]
 
@@ -430,11 +446,13 @@ def get_email_details_from_account(connectionAndN):
 
             # sender looks like "name <address@gmail.com>". We just want the first part
             try:
-                charset, encoding, text = re.match(encoded_word_regex, str(sender.split("<")[0].strip("\""))).groups()
+                charset, encoding, text = re.match(
+                    encoded_word_regex, str(sender.split("<")[0].strip('"'))
+                ).groups()
                 sender = text
             except:
-                sender = sender.split("<")[0].replace("\"", "")
-            
+                sender = sender.split("<")[0].replace('"', "")
+
             snippet = message.get("snippet")
             detailsList.append(
                 {
@@ -477,24 +495,7 @@ def create_label(label_object, app_token):
     return labelDict
 
 
-def batch_unmark_from_something(account, list_of_ids, list_of_labels, app_token):
-    connections = retrieve_accounts(app_token)
-    for connection in connections:
-        if account == connection.get("address"):
-            creds = connection.get("creds")
-            service = build("gmail", "v1", credentials=creds)
-            messages = (
-                service.users()
-                .messages()
-                .batchModify(
-                    userId="me",
-                    body={"ids": list_of_ids, "removeLabelIds": list_of_labels},
-                )
-                .execute()
-            )
-
-
-def batch_mark_as_something(addressDict, label_dict, app_token):
+def batch_unmark_from_something(addressDict, label_dict, app_token):
     for address in addressDict:
         list_of_ids = addressDict[address]
         connections = retrieve_accounts(app_token)
@@ -508,10 +509,35 @@ def batch_mark_as_something(addressDict, label_dict, app_token):
                     .messages()
                     .batchModify(
                         userId="me",
+                        body={"ids": list_of_ids, "removeLabelIds": list_of_labels},
+                    )
+                    .execute()
+                )
+
+
+def batch_mark_as_something(addressDict, label_dict, app_token):
+    for address in addressDict:
+        list_of_ids = addressDict[address]
+        connections = retrieve_accounts(app_token)
+        for connection in connections:
+            if address == connection.get("address"):
+                list_of_labels = label_dict[address]
+                creds = connection.get("creds")
+                service = build("gmail", "v1", credentials=creds)
+                print(list_of_ids)
+                print(list_of_labels)
+                messages = (
+                    service.users()
+                    .messages()
+                    .batchModify(
+                        userId="me",
                         body={"ids": list_of_ids, "addLabelIds": list_of_labels},
                     )
                     .execute()
                 )
+
+                print(messages)
+                print("as")
 
 
 def single_mark_as_read(account, message_id, app_token):
@@ -585,6 +611,6 @@ def trash_message(account, message_id, app_token):
 
 if __name__ == "__main__":
     tok = "5333867a0eeb9d3f7c29eb404ced841e663ba0816aeeffbe10d3c6e3396d2538"
-    bil = get_email_details("neilcapstonetest@gmail.com", 2, tok)
+    # bil = get_email_details("neilcapstonetest@gmail.com", 2, tok)
     hum = get_single_email("neilcapstonetest@gmail.com", "16e1ffd1248982ac", tok)
 

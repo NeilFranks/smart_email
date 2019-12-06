@@ -37,3 +37,39 @@ export const createLabel = (label, emails) => (dispatch, getState) => {
       });
     });
 };
+
+export const retrainLabel = (label, notEmails) => (dispatch, getState) => {
+  dispatch({
+    type: LOADING,
+    payload: true
+  });
+  console.log(notEmails);
+  axios
+    .post("/api/retrainLabel/", tokenConfig(getState), {
+      data: {
+        label: label,
+        notEmails: notEmails,
+        n: 30
+      }
+    })
+    .then(res => {
+      dispatch({
+        type: ADD_CATEGORY,
+        payload: res.data
+      });
+
+      dispatch({
+        type: LOADING,
+        payload: false
+      });
+      window.location.href = "/";
+    })
+    .catch(err => {
+      dispatch(returnErrors(err.response.data, err.response.status));
+
+      dispatch({
+        type: LOADING,
+        payload: false
+      });
+    });
+};

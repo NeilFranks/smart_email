@@ -14,6 +14,12 @@ from .gmail import (
     batch_unmark_from_something,
     create_label,
 )
+from .learn import (
+    mcw_from_label,
+    classifier_from_emails_and_notEmails,
+    update_classifier_from_emails_and_notEmails,
+)
+
 from rest_framework.response import Response
 from rest_framework import viewsets, permissions
 from .serializers import (
@@ -145,6 +151,9 @@ class EmailFromLabelViewSet(viewsets.GenericViewSet):
     def post(self, request):
         data = request.data
         label = data.get("label")
+        n = data.get("n")
+        if not n:
+            n = 30
         try:
             # auth is in headers like this when request comes from front end
             headers = data.get("headers")
@@ -153,7 +162,7 @@ class EmailFromLabelViewSet(viewsets.GenericViewSet):
             # auth is like this when request comes from postman
             token = request.META.get("HTTP_AUTHORIZATION")
 
-        detailsList = {"detailsList": get_email_details_from_label(label, token)}
+        detailsList = {"detailsList": get_email_details_from_label(n, label, token)}
         results = EmailDetailsSerializer(detailsList).data
         return Response(results)
 
@@ -321,7 +330,7 @@ class BatchMarkAsSomethingViewSet(viewsets.GenericViewSet):
             # auth is like this when request comes from postman
             token = request.META.get("HTTP_AUTHORIZATION")
 
-        batch_mark_as_something(address, messageIds, labelList, token)
+        # batch_mark_as_something(address, messageIds, labelList, token)
 
 
 class BatchUnmarkFromSomethingViewSet(viewsets.GenericViewSet):
@@ -344,7 +353,7 @@ class BatchUnmarkFromSomethingViewSet(viewsets.GenericViewSet):
             # auth is like this when request comes from postman
             token = request.META.get("HTTP_AUTHORIZATION")
 
-        batch_unmark_from_something(address, messageIds, labelList, token)
+        # batch_unmark_from_something(address, messageIds, labelList, token)
 
 
 class SetPageLabelsViewSet(viewsets.GenericViewSet):
@@ -375,6 +384,9 @@ class SetPageLabelsViewSet(viewsets.GenericViewSet):
         # turn categories into a dictionary
         categories = json.loads(response.content)
 
+        # keep track of num of emails assigned to categories
+        totalMoved = 0
+
         # For each category saved
         for category in categories:
             addressDict = dict()
@@ -385,8 +397,8 @@ class SetPageLabelsViewSet(viewsets.GenericViewSet):
             mcw = pickle.loads(base64.b64decode(category["mcw"]))
 
             # generate feature matrix from the given emails
-            print(emails)
-            print(mcw)
+            # print(emails)
+            # print(mcw)
             matrix = extract_features(mcw, emails)
 
             # predict with saved model
@@ -397,6 +409,11 @@ class SetPageLabelsViewSet(viewsets.GenericViewSet):
 
                 # if the model predicted that the email should be in the label
                 if email_predictions[i] == 1:
+                    category_label = email_label_ids[emails[i].get("address")][0]
+                    already_labels = emails[i].get("labels")
+
+                    if category_label not in already_labels:
+                        totalMoved += 1
 
                     # populate addressDict with only emails that are predicted
                     address = emails[i].get("address")
@@ -408,7 +425,8 @@ class SetPageLabelsViewSet(viewsets.GenericViewSet):
             # Mark all emails in addressDict with that proper label
             batch_mark_as_something(addressDict, email_label_ids, token)
 
-        return Response(data=response)
+        print(totalMoved)
+        return Response(data=totalMoved)
 
 
 class CreateLabelViewSet(viewsets.GenericViewSet):
@@ -421,6 +439,9 @@ class CreateLabelViewSet(viewsets.GenericViewSet):
         data = request.data
         label = data.get("label")
         emails = data.get("emails")
+        notEmails = data.get(
+            "notEmails"
+        )  # these are emails that should NOT be in the category.
         try:
             data = request.data
             # auth is in headers like this when request comes from front end
@@ -456,14 +477,19 @@ class CreateLabelViewSet(viewsets.GenericViewSet):
             else:
                 addressDict[address] = [email.get("id")]
 
+        print(addressDict)
+        print(create_label_response)
+
         # create_label_response should be a dictionary; keys are email addresses, values are associated label_id for the label
         batch_mark_as_something(addressDict, create_label_response, token)
 
         # train a model
-        SVC, mcw = classifier_from_label(label, token)
+        classifier, mcw = classifier_from_label(label, notEmails, token)
+
+        print(mcw)
 
         # save to database
-        pickledSVC = codecs.encode(pickle.dumps(SVC), "base64").decode()
+        pickledSVC = codecs.encode(pickle.dumps(classifier), "base64").decode()
         pickledLabelDict = codecs.encode(
             pickle.dumps(create_label_response), "base64"
         ).decode()
@@ -481,6 +507,89 @@ class CreateLabelViewSet(viewsets.GenericViewSet):
         )
 
         return Response(data=response, status=response.status_code)
+
+
+class RetrainLabelViewSet(viewsets.GenericViewSet):
+    permissions_classes = [permissions.IsAuthenticated]
+
+    def list(self, request):
+        pass
+
+    def post(self, request):
+        data = request.data
+
+        try:
+            # auth is in headers like this when request comes from front end
+            headers = data.get("headers")
+            token = headers.get("Authorization")
+        except AttributeError:
+            # auth is like this when request comes from postman
+            token = request.META.get("HTTP_AUTHORIZATION")
+
+        label = data.get("label")
+        n = data.get("n")  # there will be n emails that SHOULD be in category
+        notEmails = data.get(
+            "notEmails"
+        )  # these are emails that should NOT be in the category.
+
+        # STEP ONE: move notEmails out of the category
+        # decode label_id
+        label_id = pickle.loads(base64.b64decode(label["label_id"]))
+
+        addressDict = dict()
+        notEmailIds = []
+        for email in notEmails:
+            notEmailIds.append(email["id"])
+            address = email.get("address")
+            if address in addressDict:
+                addressDict[address].append(email.get("id"))
+            else:
+                addressDict[address] = [email.get("id")]
+
+        batch_unmark_from_something(addressDict, label_id, token)
+
+        print("Moved False-Positive emails out of category")
+
+        # STEP TWO: get n email from category
+
+        # just want most recent emails
+        try:
+            emails = get_email_details_from_label(n, label["name"], token)
+
+            print("got %s most recent emails from %s" % (n, label["name"]))
+
+            # STEP 3: train a new model
+            classifier = pickle.loads(base64.b64decode(label["classifier"]))
+
+            classifier, mcw = update_classifier_from_emails_and_notEmails(
+                classifier, label["name"], emails, notEmails, token
+            )
+
+            print("model has been trained")
+
+            # save to database
+            pickledSVC = codecs.encode(pickle.dumps(classifier), "base64").decode()
+            pickledMCW = codecs.encode(pickle.dumps(mcw), "base64").decode()
+
+            response = requests.put(
+                "%s/api/category/%s/" % (baseURL(), label["id"]),
+                headers={"Authorization": token},
+                json={
+                    "id": label["id"],
+                    "name": label["name"],
+                    "label_id": label["label_id"],
+                    "mcw": pickledMCW,
+                    "classifier": pickledSVC,
+                },
+            )
+
+            return Response(data=response, status=response.status_code)
+
+        except:
+            # something bad happened, put False-Positive emails back in!
+            batch_mark_as_something(addressDict, label_id, token)
+
+            return Response(status=500)
 
 
 def baseURL():
