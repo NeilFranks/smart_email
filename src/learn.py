@@ -190,6 +190,7 @@ commonWordList = [
 ]
 
 MCW_SIZE = 500
+NOT_EMAILS_MIN_SIZE = 30
 
 
 def remove_common_words(dict):
@@ -211,7 +212,7 @@ def mcw_from_label(label, app_token):
     n = 100
     email_list = get_email_details_from_label(n, label, app_token)
     second_list = get_emails_details_not_from_label(
-        label, None, app_token, len(email_list)
+        label, None, app_token, max(NOT_EMAILS_MIN_SIZE, n)
     )
 
     full_list = second_list + email_list
@@ -243,7 +244,7 @@ def mcw_from_label(label, app_token):
 
     train_matrix = extract_features(mcw, full_list)
 
-    classifier = SGDClassifier(loss="modified_huber", max_iter=100, warm_start=True)
+    classifier = SGDClassifier(shuffle=True, loss="log", warm_start=True)
     # Here's the model
     classifier.partial_fit(train_matrix, train_labels)
     mail = get_email_details_from_label("Not_Vice", app_token)
@@ -262,9 +263,12 @@ def classifier_from_label(label, notEmails, app_token):
 
     # if you were not provided enough "not in category" emails, go get some random ones from some other labels.
     if not notEmails or len(notEmails) < n:
-        second_list = get_emails_details_not_from_label(label, notEmails, app_token, n)
+        numNot = max(NOT_EMAILS_MIN_SIZE, n)
+        second_list = get_emails_details_not_from_label(
+            label, notEmails, app_token, numNot
+        )
     else:
-        second_list = notEmails[0:n]
+        second_list = notEmails
 
     full_list = second_list + email_list
     word_list = []
@@ -296,7 +300,7 @@ def classifier_from_label(label, notEmails, app_token):
     train_matrix = extract_features(mcw, full_list)
 
     # create and return classifier
-    classifier = SGDClassifier(loss="modified_huber", max_iter=100, warm_start=True)
+    classifier = SGDClassifier(shuffle=True, loss="log", warm_start=True)
     classifier.fit(train_matrix, train_labels)
 
     return classifier, mcw
@@ -307,9 +311,12 @@ def classifier_from_emails_and_notEmails(label, email_list, notEmails, app_token
 
     # if you were not provided enough "not in category" emails, go get some random ones from some other labels.
     if not notEmails or len(notEmails) < n:
-        second_list = get_emails_details_not_from_label(label, notEmails, app_token, n)
+        numNot = max(NOT_EMAILS_MIN_SIZE, n)
+        second_list = get_emails_details_not_from_label(
+            label, notEmails, app_token, numNot
+        )
     else:
-        second_list = notEmails[0:n]
+        second_list = notEmails
 
     print("\ngood\n")
     for email in email_list:
@@ -350,7 +357,7 @@ def classifier_from_emails_and_notEmails(label, email_list, notEmails, app_token
     train_matrix = extract_features(mcw, full_list)
 
     # create and return classifier
-    classifier = SGDClassifier()
+    classifier = SGDClassifier(shuffle=True, loss="log", warm_start=True)
     print("ah")
     classifier.partial_fit(train_matrix, train_labels)
     print(":(")
@@ -368,9 +375,12 @@ def update_classifier_from_emails_and_notEmails(
 
     # if you were not provided enough "not in category" emails, go get some random ones from some other labels.
     if not notEmails or len(notEmails) < n:
-        second_list = get_emails_details_not_from_label(label, notEmails, app_token, n)
+        numNot = max(NOT_EMAILS_MIN_SIZE, n)
+        second_list = get_emails_details_not_from_label(
+            label, notEmails, app_token, numNot
+        )
     else:
-        second_list = notEmails[0:n]
+        second_list = notEmails
 
     print("\ngood\n")
     for email in email_list:
