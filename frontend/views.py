@@ -23,3 +23,7 @@ def emailView(request):
 
 def makeCategory(request):
     return render(request, "frontend/MakeCategory.html")
+
+
+def retrainCategory(request):
+    return render(request, "frontend/RetrainCategory.html")

@@ -6,4 +6,5 @@ urlpatterns = [
     path("base", views.base),
     path("emailConnect", views.emailConnect),
     path("makeCategory", views.makeCategory),
+    path("retrainCategory", views.retrainCategory),
 ]

@@ -16,6 +16,7 @@ from .api import (
     BatchMarkAsSomethingViewSet,
     BatchUnmarkFromSomethingViewSet,
     CreateLabelViewSet,
+    RetrainLabelViewSet,
     SetPageLabelsViewSet,
 )
 
@@ -44,7 +45,7 @@ router.register("api/batchMarkAsRead", BatchMarkAsReadViewSet, "batchMarkAsRead"
 router.register("api/batchMarkAsUnread", BatchMarkAsUnreadViewSet, "batchMarkAsUnread")
 router.register("api/trashMessage", TrashViewSet, "trashMessage")
 router.register(
-    "api/batchMarkAsSomething", BatchMarkAsSomethingViewSet, "batchMarkAsSomething"
+    "api/batcDhMarkAsSomething", BatchMarkAsSomethingViewSet, "batchMarkAsSomething"
 )
 router.register(
     "api/batchUnmarkFromSomething",
@@ -53,5 +54,6 @@ router.register(
 )
 router.register("api/setPageLabel", SetPageLabelsViewSet, "setPageLabel")
 router.register("api/createLabel", CreateLabelViewSet, "createLabel")
+router.register("api/retrainLabel", RetrainLabelViewSet, "retrainLabel")
 
 urlpatterns = router.urls

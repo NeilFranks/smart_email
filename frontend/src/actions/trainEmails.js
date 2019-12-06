@@ -16,7 +16,8 @@ export const addTrainEmails = email => dispatch => {
       sender: email.emailDetails.sender,
       subject: email.emailDetails.subject,
       snippet: email.emailDetails.snippet,
-      date: email.emailDetails.date
+      date: email.emailDetails.date,
+      body: email.emailDetails.body
     }
   });
 

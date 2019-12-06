@@ -5,10 +5,11 @@ from .credsApi import add_account, retrieve_accounts
 import email
 import base64
 from collections import Counter
-from sklearn.svm import LinearSVC
+from sklearn.linear_model import SGDClassifier
 import numpy as np
 import dateutil.parser
 import multiprocessing as mp
+import random
 from .gmail import *
 
 commonWordList = [
@@ -188,6 +189,9 @@ commonWordList = [
     "2019",
 ]
 
+MCW_SIZE = 500
+NOT_EMAILS_MIN_SIZE = 30
+
 
 def remove_common_words(dict):
     words = list(dict.keys())
@@ -205,8 +209,18 @@ def remove_common_words(dict):
 
 # This naming is going to have to change.
 def mcw_from_label(label, app_token):
-    email_list = get_email_details_from_label(label, app_token)
-    second_list = get_emails_details_not_from_label(label, app_token, len(email_list))
+    n = 100
+    email_list = get_email_details_from_label(n, label, app_token)
+    second_list = get_emails_details_not_from_label(label, None, app_token, max(n, n))
+
+    print("\ngood\n")
+    for email in email_list:
+        print(email["subject"])
+
+    print("\nbad\n")
+    for email in second_list:
+        print(email["subject"])
+
     full_list = second_list + email_list
     word_list = []
     for email in full_list:
@@ -230,27 +244,48 @@ def mcw_from_label(label, app_token):
         word_list += subj_list
     mcw = Counter(word_list)
     remove_common_words(mcw)
-    mcw = mcw.most_common(200)
+    mcw = mcw.most_common(MCW_SIZE)
     train_labels = np.zeros(len(full_list))
     train_labels[len(email_list) :] = 1
 
     train_matrix = extract_features(mcw, full_list)
 
-    SVC = LinearSVC()
+    classifier = SGDClassifier(shuffle=True, loss="log")
     # Here's the model
-    SVC.fit(train_matrix, train_labels)
+    classifier.partial_fit(train_matrix, train_labels)
     mail = get_email_details_from_label("Not_Vice", app_token)
     test_matrix = extract_features(mcw, mail)
-    prediction = SVC.predict(test_matrix)
-    print(prediction)
+    prediction = classifier.predict(test_matrix)
+    # print(prediction)
     return mcw
 
     # This naming is going to have to change.
 
 
-def classifier_from_label(label, app_token):
-    email_list = get_email_details_from_label(label, app_token)
-    second_list = get_emails_details_not_from_label(label, app_token, len(email_list))
+def classifier_from_label(label, notEmails, app_token):
+    n = 30
+    email_list = get_email_details_from_label(n, label, app_token)
+    n = len(email_list)  # actual emails gotten might have been less than requested
+    print(email_list)
+    print("dude")
+
+    # if you were not provided enough "not in category" emails, go get some random ones from some other labels.
+    if not notEmails or len(notEmails) < n:
+        numNot = max(n, n)
+        second_list = get_emails_details_not_from_label(
+            label, notEmails, app_token, numNot
+        )
+    else:
+        second_list = notEmails
+
+    print("\ngood\n")
+    for email in email_list:
+        print(email["subject"])
+
+    print("\nbad\n")
+    for email in second_list:
+        print(email["subject"])
+
     full_list = second_list + email_list
     word_list = []
     for email in full_list:
@@ -274,21 +309,148 @@ def classifier_from_label(label, app_token):
         word_list += subj_list
     mcw = Counter(word_list)
     remove_common_words(mcw)
-    mcw = mcw.most_common(200)
+    mcw = mcw.most_common(MCW_SIZE)
     train_labels = np.zeros(len(full_list))
-    train_labels[len(email_list) :] = 1
+    train_labels[n:] = 1
 
     train_matrix = extract_features(mcw, full_list)
 
     # create and return classifier
-    SVC = LinearSVC()
-    SVC.fit(train_matrix, train_labels)
+    classifier = SGDClassifier(shuffle=True, loss="log")
+    classifier.fit(train_matrix, train_labels)
 
-    return SVC, mcw
+    return classifier, mcw
+
+
+def classifier_from_emails_and_notEmails(label, email_list, notEmails, app_token):
+    n = len(email_list)
+
+    # if you were not provided enough "not in category" emails, go get some random ones from some other labels.
+    if not notEmails or len(notEmails) < n:
+        numNot = max(n, n)
+        second_list = get_emails_details_not_from_label(
+            label, notEmails, app_token, numNot
+        )
+    else:
+        second_list = notEmails
+
+    print("\ngood\n")
+    for email in email_list:
+        print(email["subject"])
+
+    print("\nbad\n")
+    for email in second_list:
+        print(email["subject"])
+
+    full_list = second_list + email_list
+
+    word_list = []
+    for email in full_list:
+        email_body = email["body"]
+        email_body = (
+            email_body.replace("=0A", " ")
+            .replace("=C2", " ")
+            .replace("=A0", " ")
+            .replace("=3F", "?")
+        )
+        email_subj = email["subject"]
+        email_subj = (
+            email_subj.replace("=0A", " ")
+            .replace("=C2", " ")
+            .replace("=A0", " ")
+            .replace("=3F", "?")
+        )
+        subj_list = email_subj.split()
+        body_list = email_body.split()
+        word_list += body_list
+        word_list += subj_list
+    mcw = Counter(word_list)
+    remove_common_words(mcw)
+    mcw = mcw.most_common(MCW_SIZE)
+    train_labels = np.zeros(len(full_list))
+    train_labels[n:] = 1
+
+    train_matrix = extract_features(mcw, full_list)
+
+    # create and return classifier
+    classifier = SGDClassifier(shuffle=True, loss="log")
+    print("ah")
+    classifier.partial_fit(train_matrix, train_labels)
+    print(":(")
+
+    return classifier, mcw
+
+
+def update_classifier_from_emails_and_notEmails(
+    classifier, label, email_list, notEmails, app_token
+):
+    n = len(email_list)
+    print("agag")
+    print(n)
+    print("aohoh")
+
+    # if you were not provided enough "not in category" emails, go get some random ones from some other labels.
+    if not notEmails or len(notEmails) < n:
+        numNot = max(n, n)
+        second_list = get_emails_details_not_from_label(
+            label, notEmails, app_token, numNot
+        )
+    else:
+        second_list = notEmails
+
+    print("\ngood\n")
+    for email in email_list:
+        print(email["subject"])
+
+    print("\nbad\n")
+    for email in second_list:
+        print(email["subject"])
+
+    full_list = second_list + email_list
+
+    word_list = []
+    for email in full_list:
+        email_body = email["body"]
+        email_body = (
+            email_body.replace("=0A", " ")
+            .replace("=C2", " ")
+            .replace("=A0", " ")
+            .replace("=3F", "?")
+        )
+        email_subj = email["subject"]
+        email_subj = (
+            email_subj.replace("=0A", " ")
+            .replace("=C2", " ")
+            .replace("=A0", " ")
+            .replace("=3F", "?")
+        )
+        subj_list = email_subj.split()
+        body_list = email_body.split()
+        word_list += body_list
+        word_list += subj_list
+    mcw = Counter(word_list)
+    remove_common_words(mcw)
+    mcw = mcw.most_common(MCW_SIZE)
+    train_labels = np.zeros(len(full_list))
+    train_labels[n:] = 1
+
+    train_matrix = extract_features(mcw, full_list)
+
+    # update and return classifier
+    print(len(train_matrix))
+    shuffledRange = list(range(len(train_matrix)))
+    n_iter = 1000
+    for n in range(n_iter):
+        random.shuffle(shuffledRange)
+        shuffledX = [train_matrix[i] for i in shuffledRange]
+        shuffledY = [train_labels[i] for i in shuffledRange]
+        classifier.partial_fit(shuffledX, shuffledY)
+
+    return classifier, mcw
 
 
 def extract_features(mcw, emails):
-    features_matrix = np.zeros((len(emails), 200))
+    features_matrix = np.zeros((len(emails), MCW_SIZE))
     emailID = 0
     for email in emails:
         body = email["body"]
