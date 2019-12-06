@@ -205,10 +205,12 @@ def remove_common_words(dict):
 
 # This naming is going to have to change.
 def mcw_from_label(label, app_token):
-    email_list = get_email_details_from_label(label, app_token)
+    n = 100
+    email_list = get_email_details_from_label(n, label, app_token)
     second_list = get_emails_details_not_from_label(
         label, None, app_token, len(email_list)
     )
+
     full_list = second_list + email_list
     word_list = []
     for email in full_list:
@@ -244,23 +246,70 @@ def mcw_from_label(label, app_token):
     mail = get_email_details_from_label("Not_Vice", app_token)
     test_matrix = extract_features(mcw, mail)
     prediction = SVC.predict(test_matrix)
-    print(prediction)
+    # print(prediction)
     return mcw
 
     # This naming is going to have to change.
 
 
 def classifier_from_label(label, notEmails, app_token):
-    email_list = get_email_details_from_label(label, app_token)
-    n = len(email_list)
+    n = 30
+    email_list = get_email_details_from_label(n, label, app_token)
+    n = len(email_list)  # actual emails gotten might have been less than requested
 
     # if you were not provided enough "not in category" emails, go get some random ones from some other labels.
-    if len(notEmails) < n:
+    if not notEmails or len(notEmails) < n:
         second_list = get_emails_details_not_from_label(label, notEmails, app_token, n)
     else:
         second_list = notEmails[0:n]
 
     full_list = second_list + email_list
+    word_list = []
+    for email in full_list:
+        email_body = email["body"]
+        email_body = (
+            email_body.replace("=0A", " ")
+            .replace("=C2", " ")
+            .replace("=A0", " ")
+            .replace("=3F", "?")
+        )
+        email_subj = email["subject"]
+        email_subj = (
+            email_subj.replace("=0A", " ")
+            .replace("=C2", " ")
+            .replace("=A0", " ")
+            .replace("=3F", "?")
+        )
+        subj_list = email_subj.split()
+        body_list = email_body.split()
+        word_list += body_list
+        word_list += subj_list
+    mcw = Counter(word_list)
+    remove_common_words(mcw)
+    mcw = mcw.most_common(200)
+    train_labels = np.zeros(len(full_list))
+    train_labels[n:] = 1
+
+    train_matrix = extract_features(mcw, full_list)
+
+    # create and return classifier
+    SVC = LinearSVC()
+    SVC.fit(train_matrix, train_labels)
+
+    return SVC, mcw
+
+
+def classifier_from_emails_and_notEmails(label, email_list, notEmails, app_token):
+    n = len(email_list)
+
+    # if you were not provided enough "not in category" emails, go get some random ones from some other labels.
+    if not notEmails or len(notEmails) < n:
+        second_list = get_emails_details_not_from_label(label, notEmails, app_token, n)
+    else:
+        second_list = notEmails[0:n]
+
+    full_list = second_list + email_list
+
     word_list = []
     for email in full_list:
         email_body = email["body"]

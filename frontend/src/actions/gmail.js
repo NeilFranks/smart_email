@@ -43,10 +43,7 @@ export const retrainLabel = (label, notEmails) => (dispatch, getState) => {
     type: LOADING,
     payload: true
   });
-  console.log("hug");
-  console.log(label);
   console.log(notEmails);
-  console.log("bug");
   axios
     .post("/api/retrainLabel/", tokenConfig(getState), {
       data: {

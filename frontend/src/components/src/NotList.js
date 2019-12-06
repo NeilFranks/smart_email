@@ -50,9 +50,9 @@ export class NotList extends Component {
                 >
                   <button
                     onClick={() => this.props.removeTrainEmails(trainEmails)}
-                    className="btn btn-danger"
+                    className="btn btn-success"
                   >
-                    <strong>-</strong>
+                    <strong>◄</strong>
                   </button>
                 </td>
               </tr>

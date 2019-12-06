@@ -13,10 +13,6 @@ export const getEmailDetails = (before_time, category) => (
   dispatch,
   getState
 ) => {
-  console.log("AHH");
-  console.log(category);
-  console.log("BHH");
-
   // set the label you selected
   dispatch({
     type: SET_SELECTEDLABEL,
@@ -55,15 +51,26 @@ export const getEmailDetails = (before_time, category) => (
     );
 };
 
-export const addEmailDetails = before_time => (dispatch, getState) => {
+export const addEmailDetails = (before_time, category) => (
+  dispatch,
+  getState
+) => {
   if (before_time == null) {
     before_time = Math.floor(Date.now() / 1000);
   }
+
+  // if a category was specified, extract the values from it
+  var label_id = null;
+  if (category != null) {
+    label_id = category.label_id;
+  }
+
   axios
     .post("/api/emailDetails/", tokenConfig(getState), {
       data: {
         n: "15",
-        before_time: before_time
+        before_time: before_time,
+        label_id: label_id
       }
     })
     .then(res => {

@@ -14,7 +14,7 @@ from .gmail import (
     batch_unmark_from_something,
     create_label,
 )
-from .learn import mcw_from_label
+from .learn import mcw_from_label, classifier_from_emails_and_notEmails
 
 from rest_framework.response import Response
 from rest_framework import viewsets, permissions
@@ -147,6 +147,9 @@ class EmailFromLabelViewSet(viewsets.GenericViewSet):
     def post(self, request):
         data = request.data
         label = data.get("label")
+        n = data.get("n")
+        if not n:
+            n = 30
         try:
             # auth is in headers like this when request comes from front end
             headers = data.get("headers")
@@ -155,7 +158,7 @@ class EmailFromLabelViewSet(viewsets.GenericViewSet):
             # auth is like this when request comes from postman
             token = request.META.get("HTTP_AUTHORIZATION")
 
-        detailsList = {"detailsList": get_email_details_from_label(label, token)}
+        detailsList = {"detailsList": get_email_details_from_label(n, label, token)}
         results = EmailDetailsSerializer(detailsList).data
         return Response(results)
 
@@ -387,8 +390,8 @@ class SetPageLabelsViewSet(viewsets.GenericViewSet):
             mcw = pickle.loads(base64.b64decode(category["mcw"]))
 
             # generate feature matrix from the given emails
-            print(emails)
-            print(mcw)
+            # print(emails)
+            # print(mcw)
             matrix = extract_features(mcw, emails)
 
             # predict with saved model
@@ -495,6 +498,7 @@ class RetrainLabelViewSet(viewsets.GenericViewSet):
         pass
 
     def post(self, request):
+        print("start")
         data = request.data
 
         try:
@@ -516,7 +520,9 @@ class RetrainLabelViewSet(viewsets.GenericViewSet):
         label_id = pickle.loads(base64.b64decode(label["label_id"]))
 
         addressDict = dict()
+        notEmailIds = []
         for email in notEmails:
+            notEmailIds.append(email["id"])
             address = email.get("address")
             if address in addressDict:
                 addressDict[address].append(email.get("id"))
@@ -525,26 +531,46 @@ class RetrainLabelViewSet(viewsets.GenericViewSet):
 
         batch_unmark_from_something(addressDict, label_id, token)
 
+        print("Moved False-Positive emails out of category")
+
         # STEP TWO: get n email from category
 
         # just want most recent emails
-        before_time = int(time.time())
-        emails = get_email_details(n, before_time, label_id, token)
+        try:
+            emails = get_email_details_from_label(n, label_id, token)
 
-        # STEP 3: train a new model
-        SVC, mcw = classifier_from_label(label, notEmails, token)
+            print("got %s most recent emails from %s" % (n, label["name"]))
 
-        # save to database
-        pickledSVC = codecs.encode(pickle.dumps(SVC), "base64").decode()
-        pickledMCW = codecs.encode(pickle.dumps(mcw), "base64").decode()
+            # STEP 3: train a new model
+            SVC, mcw = classifier_from_emails_and_notEmails(
+                label, emails, notEmails, token
+            )
 
-        response = requests.post(
-            "%s/api/category/" % baseURL(),
-            headers={"Authorization": token},
-            json={"id": label["id"], "mcw": pickledMCW, "classifier": pickledSVC},
-        )
+            print("model has been trained")
 
-        return Response(data=response, status=response.status_code)
+            # save to database
+            pickledSVC = codecs.encode(pickle.dumps(SVC), "base64").decode()
+            pickledMCW = codecs.encode(pickle.dumps(mcw), "base64").decode()
+
+            response = requests.put(
+                "%s/api/category/%s/" % (baseURL(), label["id"]),
+                headers={"Authorization": token},
+                json={
+                    "id": label["id"],
+                    "name": label["name"],
+                    "label_id": label["label_id"],
+                    "mcw": pickledMCW,
+                    "classifier": pickledSVC,
+                },
+            )
+
+            return Response(data=response, status=response.status_code)
+
+        except:
+            # something bad happened, put False-Positive emails back in!
+            batch_mark_as_something(addressDict, label_id, token)
+
+            return Response(status=500)
 
 
 def baseURL():

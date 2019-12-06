@@ -10,7 +10,8 @@ export class CategoryList extends Component {
     getEmailDetails: PropTypes.func.isRequired,
     addEmailDetails: PropTypes.func.isRequired,
     addTrainEmails: PropTypes.func.isRequired,
-    trainIds: PropTypes.array.isRequired
+    trainIds: PropTypes.array.isRequired,
+    selectedLabel: PropTypes.object
   };
 
   componentDidMount() {}
@@ -58,9 +59,9 @@ export class CategoryList extends Component {
                       onClick={() =>
                         this.props.addTrainEmails({ emailDetails })
                       }
-                      className="btn btn-info"
+                      className="btn btn-danger"
                     >
-                      <strong>+</strong>
+                      <strong>►</strong>
                     </button>
                   </td>
                 </tr>
@@ -89,7 +90,7 @@ export class CategoryList extends Component {
     const last_email = emails[emails.length - 1];
     const last_date = last_email.date;
     const last_date_epoch = dateEpoch(new Date(last_date));
-    this.props.addEmailDetails(last_date_epoch);
+    this.props.addEmailDetails(last_date_epoch, this.props.selectedLabel);
     this.render();
   }
 }
@@ -107,7 +108,8 @@ function containsObject(obj, list) {
 
 const mapStateToProps = state => ({
   emailDetails: state.emailDetails.emailDetails, // get reducer, then get its actual et
-  trainIds: state.trainIds.trainIds
+  trainIds: state.trainIds.trainIds,
+  selectedLabel: state.emailDetails.selectedLabel
 });
 
 const dateString = someDate => {
@@ -125,7 +127,7 @@ const dateString = someDate => {
 };
 
 const dateEpoch = someDate => {
-  return someDate.getTime() / 1000;
+  return someDate.getTime() / 1000 - 1;
 };
 
 const snippetPrepend = snippet => {

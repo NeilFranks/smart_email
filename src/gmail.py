@@ -139,7 +139,7 @@ def get_email_details(n, before_time, label_id, app_token):
     return detailsList
 
 
-def get_email_details_from_label(label, app_token):
+def get_email_details_from_label(n, label, app_token):
     """
     Returns id, date (and time), from, and subject of the most recent n emails sent to the address.
     """
@@ -152,7 +152,7 @@ def get_email_details_from_label(label, app_token):
 
     # Step 2: `pool.map` the `get_email_details_from_account()`
     detailsList = pool.map(
-        get_emails_from_label, [(connection, label) for connection in connections]
+        get_emails_from_label, [(connection, label, n) for connection in connections]
     )  # Returns a list of lists
 
     # Flatten the list of lists
@@ -169,8 +169,10 @@ def get_emails_details_not_from_label(label, notEmails, app_token, size):
     Returns id, date (and time), from, and subject of the most recent n emails sent to the address.
     """
     idList = []  # idList is IDs of emails you already will train with
-    for email in notEmails:
-        idList.append(email.get("id"))
+
+    if notEmails:
+        for email in notEmails:
+            idList.append(email.get("id"))
 
     connections = retrieve_accounts(app_token)
     detailsList = []
@@ -194,8 +196,9 @@ def get_emails_details_not_from_label(label, notEmails, app_token, size):
     if len(detailsList) > diff:
         detailsList = detailsList[0:diff]
 
-    for email in notEmails:
-        detailsList.append(email)
+    if notEmails:
+        for email in notEmails:
+            detailsList.append(email)
 
     return detailsList
 
@@ -301,6 +304,7 @@ def get_emails_from_label(connectionAndLabel):
 
     connection = connectionAndLabel[0]
     label = connectionAndLabel[1]
+    n = connectionAndLabel[2]
 
     # get access to emails
     creds = connection.get("creds")
@@ -314,7 +318,8 @@ def get_emails_from_label(connectionAndLabel):
             label_id.append(i["id"].lstrip())
             break
 
-    results = service.users().messages().list(userId="me", labelIds=label_id).execute()
+    results = service.users().messages().list(userId="me", labelIds=label_id, 
+                maxResults=n,).execute()
     msgs = results.get("messages", [])
 
     if not msgs:
@@ -331,6 +336,7 @@ def get_emails_from_label(connectionAndLabel):
             msg_str = base64.urlsafe_b64decode(message["raw"].encode("ASCII"))
             mime_msg = email.message_from_bytes(msg_str)
             subject = ""
+            body = ""
             try:
                 encoded_word_regex = r"=\?{1}(.+)\?{1}([B|Q])\?{1}(.+)\?{1}="
                 charset, encoding, encoded_text = re.match(

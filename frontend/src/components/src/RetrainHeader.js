@@ -15,6 +15,7 @@ export class RetrainHeader extends Component {
     trainIds: PropTypes.array.isRequired,
     trainEmails: PropTypes.array.isRequired,
     retrainLabel: PropTypes.func.isRequired,
+    selectedLabel: PropTypes.object,
     loading: PropTypes.bool
   };
 
@@ -26,7 +27,7 @@ export class RetrainHeader extends Component {
     const categoryID = e.target.value;
     var category = null;
     for (var i = 0; i < this.props.categories.length; i++) {
-      if ((this.props.categories[i].id = categoryID)) {
+      if (this.props.categories[i].id == categoryID) {
         category = this.props.categories[i];
       }
     }
@@ -36,8 +37,8 @@ export class RetrainHeader extends Component {
 
   onSubmit = e => {
     e.preventDefault();
-    if (this.state.category && this.props.trainEmails.length > 0) {
-      this.props.retrainLabel(this.state.category, this.props.trainEmails);
+    if (this.props.selectedLabel) {
+      this.props.retrainLabel(this.props.selectedLabel, this.props.trainEmails);
       this.render();
     }
     //TODO: else
@@ -126,6 +127,7 @@ const mapStateToProps = state => ({
   categories: state.categories.categories,
   trainIds: state.trainIds.trainIds,
   trainEmails: state.trainEmails.trainEmails,
+  selectedLabel: state.emailDetails.selectedLabel,
   loading: state.categories.loading
 });
 
