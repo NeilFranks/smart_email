@@ -1,5 +1,5 @@
 import axios from "axios";
-import { returnErrors } from "./messages";
+import { createMessage, returnErrors } from "./messages";
 import { tokenConfig } from "./auth";
 
 import {
@@ -99,7 +99,6 @@ export const getConnectedAccounts = () => (dispatch, getState) => {
 };
 
 export const decide = emails => (dispatch, getState) => {
-  console.log(emails);
   axios
     .post("/api/setPageLabel/", tokenConfig(getState), {
       data: {
@@ -107,7 +106,9 @@ export const decide = emails => (dispatch, getState) => {
       }
     })
     .then(res => {
-      dispatch(createMessage({ decide: "Sorted some emails" }));
+      console.log("aefa");
+      const num = String(res.data);
+      dispatch(createMessage({ decide: num }));
     })
     .catch(err =>
       dispatch(returnErrors(err.response.data, err.response.status))

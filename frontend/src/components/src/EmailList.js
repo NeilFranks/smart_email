@@ -1,5 +1,4 @@
 import React, { Component, Fragment } from "react";
-import history from "./history";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
 import { getEmailDetails, decide } from "../../actions/emailDetails";

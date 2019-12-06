@@ -380,6 +380,10 @@ class SetPageLabelsViewSet(viewsets.GenericViewSet):
         # turn categories into a dictionary
         categories = json.loads(response.content)
 
+        # will be all emails that were deemed to fit some category (use to find how many were moved)
+        fitList = []
+        totalMoved = 0
+
         # For each category saved
         for category in categories:
             addressDict = dict()
@@ -402,6 +406,13 @@ class SetPageLabelsViewSet(viewsets.GenericViewSet):
 
                 # if the model predicted that the email should be in the label
                 if email_predictions[i] == 1:
+                    category_label = email_label_ids[emails[i].get("address")][0]
+                    already_labels = emails[i].get("labels")
+
+                    if category_label not in already_labels:
+                        print(category_label)
+                        print(already_labels)
+                        totalMoved += 1
 
                     # populate addressDict with only emails that are predicted
                     address = emails[i].get("address")
@@ -413,7 +424,8 @@ class SetPageLabelsViewSet(viewsets.GenericViewSet):
             # Mark all emails in addressDict with that proper label
             batch_mark_as_something(addressDict, email_label_ids, token)
 
-        return Response(data=response)
+        print(totalMoved)
+        return Response(data=totalMoved)
 
 
 class CreateLabelViewSet(viewsets.GenericViewSet):
