@@ -57,7 +57,7 @@ export class EmailList extends Component {
                     className="btn btn-info"
                     onClick={() => this.props.decide(this.props.emailDetails)}
                   >
-                    DECIDE
+                    decide
                   </button>
                 ) : (
                   <button
@@ -66,14 +66,9 @@ export class EmailList extends Component {
                       fontSize: "small"
                     }}
                     className="btn btn-info"
-                    onClick={() =>
-                      history.push({
-                        pathname: "/retrainCategory",
-                        data: this.props.selectedLabel
-                      })
-                    }
+                    onClick={() => (window.location.href = "retrainCategory")}
                   >
-                    RETRAIN
+                    retrain
                   </button>
                 )}
                 <button

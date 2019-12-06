@@ -306,6 +306,8 @@ def get_emails_from_label(connectionAndLabel):
     label = connectionAndLabel[1]
     n = connectionAndLabel[2]
 
+    print(label)
+
     # get label_id first
     address = connection["address"]
     label_id = label[address]

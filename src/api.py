@@ -468,7 +468,9 @@ class CreateLabelViewSet(viewsets.GenericViewSet):
         batch_mark_as_something(addressDict, create_label_response, token)
 
         # train a model
-        SVC, mcw = classifier_from_label(label, notEmails, token)
+        SVC, mcw = classifier_from_label(create_label_response, notEmails, token)
+
+        print(mcw)
 
         # save to database
         pickledSVC = codecs.encode(pickle.dumps(SVC), "base64").decode()

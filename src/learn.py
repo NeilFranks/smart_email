@@ -188,6 +188,8 @@ commonWordList = [
     "2019",
 ]
 
+MCW_SIZE = 500
+
 
 def remove_common_words(dict):
     words = list(dict.keys())
@@ -234,7 +236,7 @@ def mcw_from_label(label, app_token):
         word_list += subj_list
     mcw = Counter(word_list)
     remove_common_words(mcw)
-    mcw = mcw.most_common(200)
+    mcw = mcw.most_common(MCW_SIZE)
     train_labels = np.zeros(len(full_list))
     train_labels[len(email_list) :] = 1
 
@@ -286,7 +288,7 @@ def classifier_from_label(label, notEmails, app_token):
         word_list += subj_list
     mcw = Counter(word_list)
     remove_common_words(mcw)
-    mcw = mcw.most_common(200)
+    mcw = mcw.most_common(MCW_SIZE)
     train_labels = np.zeros(len(full_list))
     train_labels[n:] = 1
 
@@ -340,7 +342,7 @@ def classifier_from_emails_and_notEmails(label, email_list, notEmails, app_token
         word_list += subj_list
     mcw = Counter(word_list)
     remove_common_words(mcw)
-    mcw = mcw.most_common(200)
+    mcw = mcw.most_common(MCW_SIZE)
     train_labels = np.zeros(len(full_list))
     train_labels[n:] = 1
 
@@ -354,7 +356,7 @@ def classifier_from_emails_and_notEmails(label, email_list, notEmails, app_token
 
 
 def extract_features(mcw, emails):
-    features_matrix = np.zeros((len(emails), 200))
+    features_matrix = np.zeros((len(emails), MCW_SIZE))
     emailID = 0
     for email in emails:
         body = email["body"]
