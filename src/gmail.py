@@ -143,6 +143,8 @@ def get_email_details_from_label(n, label, app_token):
     """
     Returns id, date (and time), from, and subject of the most recent n emails sent to the address.
     """
+    print("oogog")
+    print(n)
 
     connections = retrieve_accounts(app_token)
     detailsList = []
@@ -522,6 +524,8 @@ def batch_mark_as_something(addressDict, label_dict, app_token):
                 list_of_labels = label_dict[address]
                 creds = connection.get("creds")
                 service = build("gmail", "v1", credentials=creds)
+                print(list_of_ids)
+                print(list_of_labels)
                 messages = (
                     service.users()
                     .messages()
@@ -531,6 +535,9 @@ def batch_mark_as_something(addressDict, label_dict, app_token):
                     )
                     .execute()
                 )
+
+                print(messages)
+                print("as")
 
 
 def single_mark_as_read(account, message_id, app_token):

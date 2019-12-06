@@ -477,6 +477,9 @@ class CreateLabelViewSet(viewsets.GenericViewSet):
             else:
                 addressDict[address] = [email.get("id")]
 
+        print(addressDict)
+        print(create_label_response)
+
         # create_label_response should be a dictionary; keys are email addresses, values are associated label_id for the label
         batch_mark_as_something(addressDict, create_label_response, token)
 
