@@ -226,30 +226,20 @@ def get_emails_not_from_label(connectionAndLabel):
     idList = connectionAndLabel[2]
     size = connectionAndLabel[3]
 
-    print("idList size: %s" % len(idList))
-
     # get access to emails
     creds = connection.get("creds")
     service = build("gmail", "v1", credentials=creds)
-    response = service.users().labels().list(userId="me").execute()
-    labels = response["labels"]
 
-    label_id = list()
-    for i in labels:
-        if i["name"] == label:
-            label_id.append(i["id"].lstrip())
-            break
+    print(label)
+    print(size)
 
     results = (
         service.users()
         .messages()
-        .list(
-            userId="me",
-            maxResults=size + len(idList),
-            q="is:read -label:{}".format(label),
-        )
+        .list(userId="me", maxResults=size + len(idList), q="-label:{}".format(label))
         .execute()
     )
+    print("ahah")
     msgs = results.get("messages", [])
 
     if not msgs:
@@ -308,17 +298,13 @@ def get_emails_from_label(connectionAndLabel):
 
     print(label)
 
-    # get label_id first
-    address = connection["address"]
-    label_id = label[address]
-
-    # using label_id, get n emails
+    # using label, get n emails
     creds = connection.get("creds")
     service = build("gmail", "v1", credentials=creds)
     results = (
         service.users()
         .messages()
-        .list(userId="me", labelIds=label_id, maxResults=n)
+        .list(userId="me", maxResults=n, q="label:{}".format(label))
         .execute()
     )
     msgs = results.get("messages", [])
@@ -426,11 +412,19 @@ def get_email_details_from_account(connectionAndN):
                 charset, encoding, encoded_text = re.match(
                     encoded_word_regex, mime_msg["Subject"]
                 ).groups()
-                if encoding is "B":
+
+                subject = mime_msg["Subject"]
+                if "=?US-ASCII?Q?" in subject:
+                    subject = subject.replace("=?US-ASCII?Q?", "")
+                    subject = subject.replace("?=", "")
+                    subject = subject.replace("?= ", "")
+                elif encoding is "B":
                     subject = base64.b64decode(encoded_text)
+                    subject = subject.decode()
                 elif encoding is "Q":
                     subject = quopri.decodestring(encoded_text)
-                subject = subject.decode()
+                    subject = subject.decode()
+
             except:
                 subject = mime_msg["Subject"]
 

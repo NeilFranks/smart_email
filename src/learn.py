@@ -9,6 +9,7 @@ from sklearn.linear_model import SGDClassifier
 import numpy as np
 import dateutil.parser
 import multiprocessing as mp
+import random
 from .gmail import *
 
 commonWordList = [
@@ -361,6 +362,9 @@ def update_classifier_from_emails_and_notEmails(
     classifier, label, email_list, notEmails, app_token
 ):
     n = len(email_list)
+    print("agag")
+    print(n)
+    print("aohoh")
 
     # if you were not provided enough "not in category" emails, go get some random ones from some other labels.
     if not notEmails or len(notEmails) < n:
@@ -407,7 +411,14 @@ def update_classifier_from_emails_and_notEmails(
     train_matrix = extract_features(mcw, full_list)
 
     # update and return classifier
-    classifier.partial_fit(train_matrix, train_labels)
+    print(len(train_matrix))
+    shuffledRange = list(range(len(train_matrix)))
+    n_iter = 1000
+    for n in range(n_iter):
+        random.shuffle(shuffledRange)
+        shuffledX = [train_matrix[i] for i in shuffledRange]
+        shuffledY = [train_labels[i] for i in shuffledRange]
+        classifier.partial_fit(shuffledX, shuffledY)
 
     return classifier, mcw
 

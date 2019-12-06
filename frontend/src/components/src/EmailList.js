@@ -24,15 +24,38 @@ export class EmailList extends Component {
       <Fragment>
         {!this.props.loading ? (
           !this.props.emailDetails.length ? (
-            <div
-              style={{
-                color: "#555555",
-                position: "fixed",
-                top: "30%",
-                left: "50%"
-              }}
-            >
-              no emails found
+            <div>
+              <button
+                className="btn btn-success"
+                onClick={() => this.prev()}
+                style={{
+                  float: "left",
+                  fontSize: "small"
+                }}
+              >
+                newer
+              </button>
+
+              <div
+                style={{
+                  color: "#555555",
+                  position: "fixed",
+                  top: "30%",
+                  left: "50%"
+                }}
+              >
+                no emails found
+              </div>
+              <button
+                style={{
+                  float: "right",
+                  fontSize: "small"
+                }}
+                className="btn btn-success"
+                onClick={() => this.next(this.props.emailDetails)}
+              >
+                older
+              </button>
             </div>
           ) : (
             <div>

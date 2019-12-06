@@ -481,7 +481,7 @@ class CreateLabelViewSet(viewsets.GenericViewSet):
         batch_mark_as_something(addressDict, create_label_response, token)
 
         # train a model
-        classifier, mcw = classifier_from_label(create_label_response, notEmails, token)
+        classifier, mcw = classifier_from_label(label, notEmails, token)
 
         print(mcw)
 
@@ -551,7 +551,7 @@ class RetrainLabelViewSet(viewsets.GenericViewSet):
 
         # just want most recent emails
         try:
-            emails = get_email_details_from_label(n, label_id, token)
+            emails = get_email_details_from_label(n, label["name"], token)
 
             print("got %s most recent emails from %s" % (n, label["name"]))
 
@@ -559,7 +559,7 @@ class RetrainLabelViewSet(viewsets.GenericViewSet):
             classifier = pickle.loads(base64.b64decode(label["classifier"]))
 
             classifier, mcw = update_classifier_from_emails_and_notEmails(
-                classifier, label, emails, notEmails, token
+                classifier, label["name"], emails, notEmails, token
             )
 
             print("model has been trained")
