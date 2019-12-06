@@ -40,7 +40,7 @@ export class Categories extends Component {
               {this.props.selectedLabel == null ? (
                 <tr onClick={() => this.getEmailsFromLabel()} bgcolor="#eee">
                   {/* TODO: needs to just get from inbox by default, instead of all including sent */}
-                  <td>Inbox</td>
+                  <td>All</td>
                   {/* for deletion: */}
                   <td />
                 </tr>
