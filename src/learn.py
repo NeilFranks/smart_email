@@ -244,7 +244,7 @@ def mcw_from_label(label, app_token):
 
     train_matrix = extract_features(mcw, full_list)
 
-    classifier = SGDClassifier(shuffle=True, loss="log", warm_start=True)
+    classifier = SGDClassifier(shuffle=True, loss="log")
     # Here's the model
     classifier.partial_fit(train_matrix, train_labels)
     mail = get_email_details_from_label("Not_Vice", app_token)
@@ -300,7 +300,7 @@ def classifier_from_label(label, notEmails, app_token):
     train_matrix = extract_features(mcw, full_list)
 
     # create and return classifier
-    classifier = SGDClassifier(shuffle=True, loss="log", warm_start=True)
+    classifier = SGDClassifier(shuffle=True, loss="log")
     classifier.fit(train_matrix, train_labels)
 
     return classifier, mcw
@@ -357,7 +357,7 @@ def classifier_from_emails_and_notEmails(label, email_list, notEmails, app_token
     train_matrix = extract_features(mcw, full_list)
 
     # create and return classifier
-    classifier = SGDClassifier(shuffle=True, loss="log", warm_start=True)
+    classifier = SGDClassifier(shuffle=True, loss="log")
     print("ah")
     classifier.partial_fit(train_matrix, train_labels)
     print(":(")
