@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "watch ./dev.sh",
-    "build": "watch ./dev.sh"
+    "build": "webpack --mode production ./frontend/src/emailConnect.js --output ./frontend/static/frontend/emailConnect.js && webpack --mode production ./frontend/src/emailView.js --output ./frontend/static/frontend/emailView.js && webpack --mode production ./frontend/src/MakeCategory.js --output ./frontend/static/frontend/MakeCategory.js && webpack --mode production ./frontend/src/RetrainCategory.js --output ./frontend/static/frontend/RetrainCategory.js"
   },
   "keywords": [],
   "author": "",
