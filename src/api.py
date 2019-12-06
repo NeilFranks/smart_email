@@ -384,8 +384,7 @@ class SetPageLabelsViewSet(viewsets.GenericViewSet):
         # turn categories into a dictionary
         categories = json.loads(response.content)
 
-        # will be all emails that were deemed to fit some category (use to find how many were moved)
-        fitList = []
+        # keep track of num of emails assigned to categories
         totalMoved = 0
 
         # For each category saved
@@ -414,8 +413,6 @@ class SetPageLabelsViewSet(viewsets.GenericViewSet):
                     already_labels = emails[i].get("labels")
 
                     if category_label not in already_labels:
-                        print(category_label)
-                        print(already_labels)
                         totalMoved += 1
 
                     # populate addressDict with only emails that are predicted
@@ -516,7 +513,6 @@ class RetrainLabelViewSet(viewsets.GenericViewSet):
         pass
 
     def post(self, request):
-        print("start")
         data = request.data
 
         try:

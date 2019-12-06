@@ -310,11 +310,11 @@ def classifier_from_emails_and_notEmails(label, email_list, notEmails, app_token
     else:
         second_list = notEmails[0:n]
 
-    print("good")
+    print("\ngood\n")
     for email in email_list:
         print(email["subject"])
 
-    print("bad")
+    print("\nbad\n")
     for email in second_list:
         print(email["subject"])
 
@@ -368,11 +368,11 @@ def update_classifier_from_emails_and_notEmails(
     else:
         second_list = notEmails[0:n]
 
-    print("good")
+    print("\ngood\n")
     for email in email_list:
         print(email["subject"])
 
-    print("bad")
+    print("\nbad\n")
     for email in second_list:
         print(email["subject"])
 
