@@ -215,6 +215,14 @@ def mcw_from_label(label, app_token):
         label, None, app_token, max(NOT_EMAILS_MIN_SIZE, n)
     )
 
+    print("\ngood\n")
+    for email in email_list:
+        print(email["subject"])
+
+    print("\nbad\n")
+    for email in second_list:
+        print(email["subject"])
+
     full_list = second_list + email_list
     word_list = []
     for email in full_list:
@@ -254,6 +262,9 @@ def mcw_from_label(label, app_token):
     return mcw
 
     # This naming is going to have to change.
+
+
+å
 
 
 def classifier_from_label(label, notEmails, app_token):
