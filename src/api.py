@@ -14,7 +14,11 @@ from .gmail import (
     batch_unmark_from_something,
     create_label,
 )
-from .learn import mcw_from_label, classifier_from_emails_and_notEmails
+from .learn import (
+    mcw_from_label,
+    classifier_from_emails_and_notEmails,
+    update_classifier_from_emails_and_notEmails,
+)
 
 from rest_framework.response import Response
 from rest_framework import viewsets, permissions
@@ -480,12 +484,12 @@ class CreateLabelViewSet(viewsets.GenericViewSet):
         batch_mark_as_something(addressDict, create_label_response, token)
 
         # train a model
-        SVC, mcw = classifier_from_label(create_label_response, notEmails, token)
+        classifier, mcw = classifier_from_label(create_label_response, notEmails, token)
 
         print(mcw)
 
         # save to database
-        pickledSVC = codecs.encode(pickle.dumps(SVC), "base64").decode()
+        pickledSVC = codecs.encode(pickle.dumps(classifier), "base64").decode()
         pickledLabelDict = codecs.encode(
             pickle.dumps(create_label_response), "base64"
         ).decode()
@@ -556,14 +560,16 @@ class RetrainLabelViewSet(viewsets.GenericViewSet):
             print("got %s most recent emails from %s" % (n, label["name"]))
 
             # STEP 3: train a new model
-            SVC, mcw = classifier_from_emails_and_notEmails(
-                label, emails, notEmails, token
+            classifier = pickle.loads(base64.b64decode(label["classifier"]))
+
+            classifier, mcw = update_classifier_from_emails_and_notEmails(
+                classifier, label, emails, notEmails, token
             )
 
             print("model has been trained")
 
             # save to database
-            pickledSVC = codecs.encode(pickle.dumps(SVC), "base64").decode()
+            pickledSVC = codecs.encode(pickle.dumps(classifier), "base64").decode()
             pickledMCW = codecs.encode(pickle.dumps(mcw), "base64").decode()
 
             response = requests.put(

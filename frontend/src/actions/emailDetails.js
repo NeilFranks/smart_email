@@ -34,7 +34,7 @@ export const getEmailDetails = (before_time, category) => (
   axios
     .post("/api/emailDetails/", tokenConfig(getState), {
       data: {
-        n: "15",
+        n: "25",
         before_time: before_time,
         label_id: label_id
       }
@@ -68,7 +68,7 @@ export const addEmailDetails = (before_time, category) => (
   axios
     .post("/api/emailDetails/", tokenConfig(getState), {
       data: {
-        n: "15",
+        n: "25",
         before_time: before_time,
         label_id: label_id
       }
@@ -106,7 +106,6 @@ export const decide = emails => (dispatch, getState) => {
       }
     })
     .then(res => {
-      console.log("aefa");
       const num = String(res.data);
       dispatch(createMessage({ decide: num }));
     })

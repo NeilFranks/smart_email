@@ -5,7 +5,7 @@ from .credsApi import add_account, retrieve_accounts
 import email
 import base64
 from collections import Counter
-from sklearn.svm import LinearSVC
+from sklearn.linear_model import SGDClassifier
 import numpy as np
 import dateutil.parser
 import multiprocessing as mp
@@ -242,12 +242,12 @@ def mcw_from_label(label, app_token):
 
     train_matrix = extract_features(mcw, full_list)
 
-    SVC = LinearSVC()
+    classifier = SGDClassifier(loss="modified_huber", max_iter=100, warm_start=True)
     # Here's the model
-    SVC.fit(train_matrix, train_labels)
+    classifier.partial_fit(train_matrix, train_labels)
     mail = get_email_details_from_label("Not_Vice", app_token)
     test_matrix = extract_features(mcw, mail)
-    prediction = SVC.predict(test_matrix)
+    prediction = classifier.predict(test_matrix)
     # print(prediction)
     return mcw
 
@@ -295,10 +295,10 @@ def classifier_from_label(label, notEmails, app_token):
     train_matrix = extract_features(mcw, full_list)
 
     # create and return classifier
-    SVC = LinearSVC()
-    SVC.fit(train_matrix, train_labels)
+    classifier = SGDClassifier(loss="modified_huber", max_iter=100, warm_start=True)
+    classifier.fit(train_matrix, train_labels)
 
-    return SVC, mcw
+    return classifier, mcw
 
 
 def classifier_from_emails_and_notEmails(label, email_list, notEmails, app_token):
@@ -349,10 +349,67 @@ def classifier_from_emails_and_notEmails(label, email_list, notEmails, app_token
     train_matrix = extract_features(mcw, full_list)
 
     # create and return classifier
-    SVC = LinearSVC()
-    SVC.fit(train_matrix, train_labels)
+    classifier = SGDClassifier()
+    print("ah")
+    classifier.partial_fit(train_matrix, train_labels)
+    print(":(")
 
-    return SVC, mcw
+    return classifier, mcw
+
+
+def update_classifier_from_emails_and_notEmails(
+    classifier, label, email_list, notEmails, app_token
+):
+    n = len(email_list)
+
+    # if you were not provided enough "not in category" emails, go get some random ones from some other labels.
+    if not notEmails or len(notEmails) < n:
+        second_list = get_emails_details_not_from_label(label, notEmails, app_token, n)
+    else:
+        second_list = notEmails[0:n]
+
+    print("good")
+    for email in email_list:
+        print(email["subject"])
+
+    print("bad")
+    for email in second_list:
+        print(email["subject"])
+
+    full_list = second_list + email_list
+
+    word_list = []
+    for email in full_list:
+        email_body = email["body"]
+        email_body = (
+            email_body.replace("=0A", " ")
+            .replace("=C2", " ")
+            .replace("=A0", " ")
+            .replace("=3F", "?")
+        )
+        email_subj = email["subject"]
+        email_subj = (
+            email_subj.replace("=0A", " ")
+            .replace("=C2", " ")
+            .replace("=A0", " ")
+            .replace("=3F", "?")
+        )
+        subj_list = email_subj.split()
+        body_list = email_body.split()
+        word_list += body_list
+        word_list += subj_list
+    mcw = Counter(word_list)
+    remove_common_words(mcw)
+    mcw = mcw.most_common(MCW_SIZE)
+    train_labels = np.zeros(len(full_list))
+    train_labels[n:] = 1
+
+    train_matrix = extract_features(mcw, full_list)
+
+    # update and return classifier
+    classifier.partial_fit(train_matrix, train_labels)
+
+    return classifier, mcw
 
 
 def extract_features(mcw, emails):
