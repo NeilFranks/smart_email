@@ -308,6 +308,14 @@ def classifier_from_emails_and_notEmails(label, email_list, notEmails, app_token
     else:
         second_list = notEmails[0:n]
 
+    print("good")
+    for email in email_list:
+        print(email["subject"])
+
+    print("bad")
+    for email in second_list:
+        print(email["subject"])
+
     full_list = second_list + email_list
 
     word_list = []

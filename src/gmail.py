@@ -306,20 +306,19 @@ def get_emails_from_label(connectionAndLabel):
     label = connectionAndLabel[1]
     n = connectionAndLabel[2]
 
-    # get access to emails
+    # get label_id first
+    address = connection["address"]
+    label_id = label[address]
+
+    # using label_id, get n emails
     creds = connection.get("creds")
     service = build("gmail", "v1", credentials=creds)
-    response = service.users().labels().list(userId="me").execute()
-    labels = response["labels"]
-
-    label_id = list()
-    for i in labels:
-        if i["name"] == label:
-            label_id.append(i["id"].lstrip())
-            break
-
-    results = service.users().messages().list(userId="me", labelIds=label_id, 
-                maxResults=n,).execute()
+    results = (
+        service.users()
+        .messages()
+        .list(userId="me", labelIds=label_id, maxResults=n)
+        .execute()
+    )
     msgs = results.get("messages", [])
 
     if not msgs:
